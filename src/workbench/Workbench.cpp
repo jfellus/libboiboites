@@ -44,21 +44,19 @@ void workbench_set_status(const std::string& text) {
 ///////////////
 
 GLADE_CALLBACK {
-	void on_create_group(GtkToolButton* w, gpointer u) {		Workbench::cur()->create_module();	}
-	void on_create_link(GtkToolButton* w, gpointer u) {		Workbench::cur()->create_link();		}
-	void on_new(GtkMenuItem* m, gpointer u) {				Workbench::cur()->new_document();		}
-	void on_open(GtkMenuItem* m, gpointer u) {				Workbench::cur()->open_dialog();		}
-	void on_close(GtkMenuItem* m, gpointer u) {				Workbench::cur()->close();				}
+	void on_new() {				Workbench::cur()->new_document();		}
+	void on_open() {				Workbench::cur()->open_dialog();		}
+	void on_close() {				Workbench::cur()->close();				}
 }
 
-static void on_key_saveas()  {Workbench::cur()->save_dialog();}
+static void on_saveas()  {Workbench::cur()->save_dialog();}
 
-static void on_key_group() {Workbench::cur()->group_selection();}
-static void on_key_ungroup() {Workbench::cur()->ungroup_selected();}
-static void on_key_change_group() {Workbench::cur()->change_group_selected();}
-static void on_key_delete() {Workbench::cur()->delete_selection();}
-static void on_key_create_module() {Workbench::cur()->create_module();}
-static void on_key_create_link()  {Workbench::cur()->create_link();}
+static void on_group() {Workbench::cur()->group_selection();}
+static void on_ungroup() {Workbench::cur()->ungroup_selected();}
+static void on_change_group() {Workbench::cur()->change_group_selected();}
+static void on_delete() {Workbench::cur()->delete_selection();}
+static void on_create_module() {Workbench::cur()->create_module();}
+static void on_create_link()  {Workbench::cur()->create_link();}
 
 static void on_key_tag1_on()  {Workbench::cur()->add_selection_tag(1);}
 static void on_key_tag2_on()  {Workbench::cur()->add_selection_tag(2);}
@@ -81,21 +79,21 @@ Workbench::Workbench() {
 	win = new Window();
 	ERROR_STREAM = new MessageErrorStream();
 
-	win->add_tab(properties = new PropertiesForm(), "Properties");
 	canvas = win->canvas;
-	win->add_tab(infoform = new InfoForm(), "Infos");
+	win->add_tab(properties = new PropertiesForm(), "Properties");
+//	win->add_tab(infoform = new InfoForm(), "Infos");
 	document = new Document();
 
 	document->add_module_selection_listener(this);
 	document->add_link_selection_listener(this);
 	document->add_properties_listener(this);
 
-	canvas->add_key_listener(new IKeyListener(GDK_KEY_g, GDK_CONTROL_MASK, on_key_group));
-	canvas->add_key_listener(new IKeyListener(GDK_KEY_G, GDK_CONTROL_MASK | GDK_SHIFT_MASK, on_key_ungroup));
-	canvas->add_key_listener(new IKeyListener(GDK_KEY_g, 0, on_key_change_group));
-	canvas->add_key_listener(new IKeyListener(GDK_KEY_Delete, 0, on_key_delete));
-	canvas->add_key_listener(new IKeyListener(GDK_KEY_m, 0, on_key_create_module));
-	canvas->add_key_listener(new IKeyListener(GDK_KEY_l, 0, on_key_create_link));
+	canvas->add_key_listener(new IKeyListener(GDK_KEY_g, GDK_CONTROL_MASK, on_group));
+	canvas->add_key_listener(new IKeyListener(GDK_KEY_G, GDK_CONTROL_MASK | GDK_SHIFT_MASK, on_ungroup));
+	canvas->add_key_listener(new IKeyListener(GDK_KEY_g, 0, on_change_group));
+	canvas->add_key_listener(new IKeyListener(GDK_KEY_Delete, 0, on_delete));
+	canvas->add_key_listener(new IKeyListener(GDK_KEY_m, 0, on_create_module));
+	canvas->add_key_listener(new IKeyListener(GDK_KEY_l, 0, on_create_link));
 
 	canvas->add_key_listener(new IKeyListener(GDK_KEY_KP_1, GDK_CONTROL_MASK, ::on_key_tag1_on));
 	canvas->add_key_listener(new IKeyListener(GDK_KEY_KP_2, GDK_CONTROL_MASK, ::on_key_tag2_on));
@@ -104,9 +102,16 @@ Workbench::Workbench() {
 	canvas->add_key_listener(new IKeyListener(GDK_KEY_KP_Down,  GDK_SHIFT_MASK, ::on_key_tag2_off));
 	canvas->add_key_listener(new IKeyListener(GDK_KEY_KP_Page_Down,  GDK_SHIFT_MASK, ::on_key_tag3_off));
 
-	canvas->add_key_listener(new IKeyListener(GDK_KEY_s, GDK_CONTROL_MASK, on_key_saveas));
+	canvas->add_key_listener(new IKeyListener(GDK_KEY_s, GDK_CONTROL_MASK, on_saveas));
 
 	canvas->add_selection_listener(this);
+
+	win->add_menu("_File>_New", on_new);
+	win->add_menu("_File>_Open", on_open);
+	win->add_menu("_File>_Close", on_close);
+	win->add_menu("_File>_Save", on_saveas);
+	win->add_menu("_File>_Save as", on_saveas);
+
 }
 
 Workbench::~Workbench() {

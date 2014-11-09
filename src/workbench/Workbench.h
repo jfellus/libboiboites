@@ -8,7 +8,7 @@
 #ifndef COEOS_WORKBENCH_H_
 #define COEOS_WORKBENCH_H_
 
-#include <widget/Window.h>
+#include "../widget/Window.h"
 #include "../module/Document.h"
 #include <util/gui.h>
 #include "../widget/PropertiesForm.h"
