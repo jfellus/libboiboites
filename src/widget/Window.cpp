@@ -65,7 +65,7 @@ Window::~Window() {
 void Window::add_menu(const char* menustr, void (*callback)(), int accelerator_key) {
 	GtkWidget* curmenu = menubar;
 	GtkWidget* item = NULL;
-
+	bool bSeparator = false;
 	char str[512]; strcpy(str, menustr);
 	char *curstr = strtok(str, "/>");
 	for(int i=0; curstr!=0; i++) {
@@ -81,13 +81,18 @@ void Window::add_menu(const char* menustr, void (*callback)(), int accelerator_k
 		  if(!strcmp(curstr,gtk_menu_item_get_label(e))) item = GTK_WIDGET(e);
 		}
 		if(item==NULL) {
-			item = gtk_menu_item_new_with_mnemonic(curstr);
+			if(!strcmp(curstr, "__")) {
+				bSeparator = true;
+				item = gtk_separator_menu_item_new();
+			} else {
+				item = gtk_menu_item_new_with_mnemonic(curstr);
+			}
 			gtk_menu_shell_append(GTK_MENU_SHELL(curmenu), item);
 		}
 		curstr = strtok(NULL, "/>");
 	}
 
-	g_signal_connect(G_OBJECT(item), "activate", G_CALLBACK(callback), NULL);
+	if(!bSeparator) g_signal_connect(G_OBJECT(item), "activate", G_CALLBACK(callback), NULL);
 }
 
 

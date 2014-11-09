@@ -65,6 +65,7 @@ static void on_key_tag1_off()  {Workbench::cur()->remove_selection_tag(1);}
 static void on_key_tag2_off()  {Workbench::cur()->remove_selection_tag(2);}
 static void on_key_tag3_off()  {Workbench::cur()->remove_selection_tag(3);}
 
+static void on_zoom_all()  {Workbench::cur()->canvas->zoom_all();}
 
 
 
@@ -111,6 +112,26 @@ Workbench::Workbench() {
 	win->add_menu("_File>_Close", on_close);
 	win->add_menu("_File>_Save", on_saveas);
 	win->add_menu("_File>_Save as", on_saveas);
+	win->add_menu("_File>__", NULL);
+	win->add_menu("_File>_Quit", gtk_main_quit);
+
+	win->add_menu("_Create>_Module", on_create_module);
+	win->add_menu("_Create>_Link", on_create_link);
+	win->add_menu("_Create>__", NULL);
+	win->add_menu("_Create>_Group from selection", on_group);
+	win->add_menu("_Edit>_Delete selection",on_delete);
+	win->add_menu("_View>Zoom All" , on_zoom_all);
+	win->add_menu("_View>__", NULL);
+	win->add_menu("_View>Add tag 1 to selection" , on_key_tag1_on);
+	win->add_menu("_View>Add tag 2 to selection" , on_key_tag2_on);
+	win->add_menu("_View>Add tag 3 to selection" , on_key_tag2_on);
+	win->add_menu("_View>Remove tag 1 to selection" , on_key_tag1_off);
+	win->add_menu("_View>Remove tag 2 to selection" , on_key_tag2_off);
+	win->add_menu("_View>Remove tag 3 to selection" , on_key_tag3_off);
+	win->add_menu("_Group>_Group selection", on_group);
+	win->add_menu("_Group>_Ungroup selection", on_ungroup);
+	win->add_menu("_Group>__", NULL);
+	win->add_menu("_Group>_Move selection to group", on_change_group);
 
 }
 
