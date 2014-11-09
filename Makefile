@@ -16,11 +16,14 @@
 ################################
 
 
-APT_GET_DEPENDENCIES:= libmicrohttpd-dev libmicrohttpd10 libgtk-3-dev libwebkitgtk-dev libxml++2.6-dev
+APT_GET_DEPENDENCIES:= libmicrohttpd-dev libmicrohttpd10 libgtk-3-dev libwebkitgtk-dev
 
 
-REQUIRED_PACKAGES:= cairo gtk+-3.0 webkitgtk-3.0 libmicrohttpd libxml++-2.6
-REQUIRED_LIBS:= -lpthread
+REQUIRED_PACKAGES:= cairo gtk+-3.0 webkitgtk-3.0 libmicrohttpd
+REQUIRED_LIBS:= -lpthread -lgraphounet 
+
+PATH_TO_LIBGRAPHOUNET:=../libgraphounet
+INCLUDE_PATH_LIBGRAPHOUNET:=$(PATH_TO_LIBGRAPHOUNET)/src
 
 
 SRC_DIR:=./src
@@ -40,8 +43,8 @@ OBJS := $(addprefix bin/,$(SRC:.cpp=.o))
 
 $(LIBRARY_NAME): $(OBJS)
 
-CXXFLAGS := -g -rdynamic -Wall -MMD `pkg-config --cflags $(REQUIRED_PACKAGES)`
-LDFLAGS := -rdynamic `pkg-config --libs $(REQUIRED_PACKAGES)` $(REQUIRED_LIBS)
+CXXFLAGS := -g -rdynamic -Wall -MMD `pkg-config --cflags $(REQUIRED_PACKAGES)` -I$(INCLUDE_PATH_LIBGRAPHOUNET)
+LDFLAGS := -rdynamic `pkg-config --libs $(REQUIRED_PACKAGES)` -L/home/$(USER)/bin_leto_prom/ $(REQUIRED_LIBS) -Wl,-rpath=/home/$(USER)/bin_leto_prom/
 DEPENDS = $(OBJS:.o=.d)    
 
 $(LIBRARY_NAME) : $(OBJS)          

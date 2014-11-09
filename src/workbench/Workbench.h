@@ -8,9 +8,11 @@
 #ifndef COEOS_WORKBENCH_H_
 #define COEOS_WORKBENCH_H_
 
-#include "../widget/Window.h"
+#include <widget/Window.h>
 #include "../module/Document.h"
-#include "../util/gui.h"
+#include <util/gui.h>
+#include "../widget/PropertiesForm.h"
+#include "../widget/InfoForm.h"
 
 
 // Utils
@@ -20,7 +22,7 @@ void workbench_set_status(const std::string& text);
 
 
 
-class Workbench : public IModuleSelectionListener, ILinkSelectionListener, IPropertiesListener {
+class Workbench : public IModuleSelectionListener, ILinkSelectionListener, IPropertiesListener, ISelectionListener {
 public:
 	Document* document = 0;
 
@@ -79,7 +81,7 @@ public:
 	virtual void on_module_selected(Module* m, bool bSelected);
 	virtual void on_link_selected(Link* m, bool bSelected);
 	virtual void on_property_change(IPropertiesElement* m, const std::string& name, const std::string& val) {	canvas->repaint();	}
-
+	virtual void on_selection_event(ISelectable* s);
 
 	// Debug
 

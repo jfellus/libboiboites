@@ -8,7 +8,7 @@
 #ifndef GROUP_H_
 #define GROUP_H_
 
-#include "../util/utils.h"
+#include <util/utils.h>
 #include "Module.h"
 
 class GroupOpenComponent;

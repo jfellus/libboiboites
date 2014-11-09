@@ -7,9 +7,11 @@
 
 #include <gtk/gtk.h>
 #include "Workbench.h"
-#include "../components/LinkCreator.h"
-#include "../components/ModuleCreator.h"
-#include "../components/ChangeGroupCreator.h"
+#include "../creators/LinkCreator.h"
+#include "../creators/ModuleCreator.h"
+#include "../creators/ChangeGroupCreator.h"
+#include "../widget/PropertiesForm.h"
+#include "../widget/InfoForm.h"
 
 
 static Workbench* _cur = 0;
@@ -79,9 +81,9 @@ Workbench::Workbench() {
 	win = new Window();
 	ERROR_STREAM = new MessageErrorStream();
 
-	properties = win->properties;
+	win->add_tab(properties = new PropertiesForm(), "Properties");
 	canvas = win->canvas;
-	infoform = win->infoform;
+	win->add_tab(infoform = new InfoForm(), "Infos");
 	document = new Document();
 
 	document->add_module_selection_listener(this);
@@ -103,6 +105,8 @@ Workbench::Workbench() {
 	canvas->add_key_listener(new IKeyListener(GDK_KEY_KP_Page_Down,  GDK_SHIFT_MASK, ::on_key_tag3_off));
 
 	canvas->add_key_listener(new IKeyListener(GDK_KEY_s, GDK_CONTROL_MASK, on_key_saveas));
+
+	canvas->add_selection_listener(this);
 }
 
 Workbench::~Workbench() {
@@ -195,3 +199,8 @@ void Workbench::on_link_selected(Link* m, bool bSelected) {
 	else vector_remove(selected_links, m);
 	if(!canvas->isSelecting) update();
 }
+
+void Workbench::on_selection_event(ISelectable* s) {
+	update();
+}
+

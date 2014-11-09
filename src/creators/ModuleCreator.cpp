@@ -6,7 +6,7 @@
  */
 
 #include "ModuleCreator.h"
-#include "../widget/ZoomableDrawingArea.h"
+#include <ZoomableDrawingArea.h>
 #include "../module/Document.h"
 
 ModuleCreator::ModuleCreator() {

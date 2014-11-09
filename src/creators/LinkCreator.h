@@ -9,7 +9,7 @@
 #define LINKCREATOR_H_
 
 
-#include "Creator.h"
+#include <creator/Creator.h>
 #include "../module/Link.h"
 #include "../module/Document.h"
 

@@ -8,12 +8,12 @@
 #ifndef DOCUMENT_H_
 #define DOCUMENT_H_
 
-#include "../util/utils.h"
-#include "../util/selection/ISelectionListener.h"
+#include <util/utils.h>
+#include <util/selection/ISelectionListener.h>
 #include "Module.h"
 #include "Link.h"
 #include "Group.h"
-#include "GroupComponent.h"
+#include "../components/GroupComponent.h"
 
 class IModuleSelectionListener {
 public:

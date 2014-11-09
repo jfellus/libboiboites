@@ -8,9 +8,10 @@
 #ifndef GROUPCOMPONENT_H_
 #define GROUPCOMPONENT_H_
 
-#include "../components/Component.h"
-#include "../components/SVGComponent.h"
-#include "Group.h"
+#include <Component.h>
+#include <components/SVGComponent.h>
+#include "../module/Group.h"
+#include "ModuleComponent.h"
 
 ///////////
 // STYLE //

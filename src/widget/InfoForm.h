@@ -8,8 +8,8 @@
 #ifndef INFOFORM_H_
 #define INFOFORM_H_
 
-#include "Widget.h"
-#include "../util/utils.h"
+#include <widget/Widget.h>
+#include <util/utils.h>
 
 
 class InfoForm : public Widget {

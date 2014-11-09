@@ -8,7 +8,7 @@
 #ifndef CHANGEGROUPCREATOR_H_
 #define CHANGEGROUPCREATOR_H_
 
-#include "Creator.h"
+#include <creator/Creator.h>
 #include "../module/Group.h"
 
 class ChangeGroupCreator : public Creator {

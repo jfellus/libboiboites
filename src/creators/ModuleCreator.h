@@ -8,7 +8,7 @@
 #ifndef MODULECREATOR_H_
 #define MODULECREATOR_H_
 
-#include "Creator.h"
+#include <creator/Creator.h>
 #include "../module/Module.h"
 
 class ModuleCreator : public Creator {

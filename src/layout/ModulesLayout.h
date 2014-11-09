@@ -8,7 +8,7 @@
 #ifndef MODULESLAYOUT_H_
 #define MODULESLAYOUT_H_
 
-#include "../util/utils.h"
+#include <util/utils.h>
 
 class ModulesLayout {
 public:

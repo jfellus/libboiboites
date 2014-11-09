@@ -9,10 +9,10 @@
 
 #include "Group.h"
 #include "Document.h"
-#include "../widget/ZoomableDrawingArea.h"
+#include <ZoomableDrawingArea.h>
 #include "../workbench/Workbench.h"
-#include "../components/SVGComponent.h"
-#include "GroupComponent.h"
+#include <components/SVGComponent.h>
+#include "../components/GroupComponent.h"
 
 
 

@@ -9,7 +9,7 @@
 
 #include <gtk/gtk.h>
 #include <webkit/webkit.h>
-#include "../util/utils.h"
+#include <util/utils.h>
 #include "../util/http/HTTPServer.h"
 #include "ZoomableDrawingArea.h"
 

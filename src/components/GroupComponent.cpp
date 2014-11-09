@@ -6,7 +6,7 @@
  */
 
 #include "GroupComponent.h"
-#include "../widget/ZoomableDrawingArea.h"
+#include <ZoomableDrawingArea.h>
 
 
 void GroupOpenComponent::render(Graphics& g) {

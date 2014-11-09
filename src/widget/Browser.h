@@ -8,9 +8,9 @@
 #ifndef BROWSER_H_
 #define BROWSER_H_
 
-#include "Widget.h"
+#include <widget/Widget.h>
 #include <webkit/webkit.h>
-#include "../util/utils.h"
+#include <util/utils.h>
 
 
 class Browser : public Widget {

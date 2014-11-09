@@ -8,7 +8,7 @@
 #ifndef DYNENGINE_H_
 #define DYNENGINE_H_
 
-#include "../util/utils.h"
+#include <util/utils.h>
 #include "Body.h"
 
 class DynEngine {

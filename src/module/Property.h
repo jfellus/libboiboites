@@ -8,7 +8,7 @@
 #ifndef PROPERTY_H_
 #define PROPERTY_H_
 
-#include "../util/utils.h"
+#include <util/utils.h>
 
 
 class Property {

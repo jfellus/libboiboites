@@ -7,8 +7,8 @@
 
 #include "ChangeGroupCreator.h"
 #include "../module/Document.h"
-#include "../module/GroupComponent.h"
-#include "../widget/ZoomableDrawingArea.h"
+#include "../components/GroupComponent.h"
+#include <ZoomableDrawingArea.h>
 #include "../workbench/Workbench.h"
 
 ChangeGroupCreator::ChangeGroupCreator() {

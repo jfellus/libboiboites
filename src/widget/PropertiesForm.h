@@ -12,7 +12,7 @@
 #include "../module/Property.h"
 #include "../module/Module.h"
 #include "../module/Link.h"
-#include "../util/utils.h"
+#include <util/utils.h>
 
 class PropertiesForm : public Browser {
 public:

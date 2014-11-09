@@ -6,8 +6,8 @@
  */
 
 #include "LinkCreator.h"
-#include "LinkComponent.h"
-#include "../widget/ZoomableDrawingArea.h"
+#include "../components/LinkLinkComponent.h"
+#include <ZoomableDrawingArea.h>
 #include "../module/Document.h"
 
 

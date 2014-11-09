@@ -8,8 +8,8 @@
 #ifndef BODY_H_
 #define BODY_H_
 
-#include "../util/utils.h"
-#include "../util/geom.h"
+#include <util/utils.h>
+#include <util/geom.h>
 
 class DynEngine;
 
