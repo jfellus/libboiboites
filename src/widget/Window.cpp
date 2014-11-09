@@ -21,7 +21,7 @@ typedef struct _callbacks {
 
 Window::Window() : Widget(NULL){
 	builder = gtk_builder_new ();
-	gtk_builder_add_from_file (builder, "gui.xml", NULL);
+	gtk_builder_add_from_file (builder, "gui.glade", NULL);
 	widget = GTK_WIDGET (gtk_builder_get_object (builder, "window"));
 	gtk_builder_connect_signals (builder, NULL);
 
