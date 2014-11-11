@@ -47,8 +47,7 @@ InfoForm::InfoForm() : Widget(gtk_box_new(GTK_ORIENTATION_VERTICAL, 0)) {
 }
 
 void InfoForm::set_font(const char* f) {
-	PangoFontDescription *font_desc = pango_font_description_from_string (f);
-	gtk_widget_modify_font (txt, font_desc);
+	gtk_widget_modify_font (GTK_WIDGET(txt), (PangoFontDescription*) pango_font_description_from_string (f));
 }
 
 
@@ -56,9 +55,8 @@ void InfoForm::update() {
 	std::ostringstream s;
 	s << "\n\n----\n";
 	s << "Infos : \n";
-	s << "Selected modules : " << Workbench::cur()->selected_modules.size() << "\n";
-	s << Workbench::cur()->selected_modules << "\n";
-	s << "Selected links : " << Workbench::cur()->selected_links.size() << "\n";
+	s << "Selected modules : " << Workbench::cur()->get_selected_modules()->size() << "\n";
+	s << "Selected links : " << Workbench::cur()->get_selected_links()->size() << "\n";
 	if(Document::cur()) {
 		s << "Document modules : " << Document::cur()->modules.size() << "\n";
 		s << "Document links : " << Document::cur()->links.size() << "\n";

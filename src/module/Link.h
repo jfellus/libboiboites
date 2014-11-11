@@ -28,19 +28,19 @@ public:
 
 
 	virtual void select() {
-		if(src->has_selected_ancestor() || dst->has_selected_ancestor()) {unselect(); return;}
+		//if(src->has_selected_ancestor() || dst->has_selected_ancestor()) {unselect(); return;}
 		component->select(false);
 		ISelectable::select();
 	}
 
 	virtual void unselect() {
-		component->unselect();
+		if(component) component->unselect();
 		ISelectable::unselect();
 	}
 
 	virtual void on_selection_event(ISelectable* s) {
 		if(s!=component) return;
-		if(src->has_selected_ancestor() || dst->has_selected_ancestor()) {unselect(); return;}
+		//if(src->has_selected_ancestor() || dst->has_selected_ancestor()) {unselect(); return;}
 		if(s->bSelected) ISelectable::select(); else ISelectable::unselect();
 	}
 

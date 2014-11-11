@@ -43,16 +43,8 @@ public:
 	virtual void remove_class(const std::string& cls) {	component->remove_class(cls);	}
 
 
-	virtual void show() {
-		component->show();
-		visible = true;
-	}
-
-	virtual void hide() {
-		unselect();
-		component->hide();
-		visible = false;
-	}
+	virtual void show() {		component->show();		visible = true;	}
+	virtual void hide() {		unselect();		component->hide();		visible = false;	}
 
 
 	virtual void translate(double dx, double dy) {
@@ -60,16 +52,7 @@ public:
 	}
 
 	virtual void select();
-
-
-	virtual void unselect() {
-		if(component) component->unselect();
-		if(bSelected) {
-			ISelectable::unselect();
-		}
-		bSelected = false;
-	}
-
+	virtual void unselect();
 	virtual void on_selection_event(ISelectable* s);
 
 	virtual void on_dbl_click(ISelectable* s, GdkEventButton* e) {

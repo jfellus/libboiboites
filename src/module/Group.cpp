@@ -10,7 +10,6 @@
 #include "Group.h"
 #include "Document.h"
 #include <ZoomableDrawingArea.h>
-#include "../workbench/Workbench.h"
 #include <components/SVGComponent.h>
 #include "../components/GroupComponent.h"
 
@@ -95,8 +94,9 @@ void Group::open() {
 	component->hide();
 	component_open->show();
 	opened = true;
-	Workbench::cur()->unselect_all();
+	Document::cur()->unselect_all();
 	component_open->select(true);
+	Document::cur()->fire_change_event();
 }
 
 void Group::close() {
@@ -113,6 +113,7 @@ void Group::close() {
 	component_open->hide();
 	component->center(r.center());
 	visible = true;
+	Document::cur()->fire_change_event();
 }
 
 void Group::translate(double dx, double dy) {
@@ -127,6 +128,7 @@ void Group::translate(double dx, double dy) {
 }
 
 void Group::hide() {
+	if(!visible) return;
 	component->hide();
 	component_open->hide();
 	for(uint i=0; i<children.size(); i++) children[i]->hide();
@@ -134,6 +136,7 @@ void Group::hide() {
 }
 
 void Group::show() {
+	if(visible) return;
 	if(opened) {
 		open();
 		for(uint i=0; i<children.size(); i++) children[i]->show();
@@ -156,7 +159,7 @@ Rectangle Group::get_bounds() {
 void Group::on_dbl_click(ISelectable* s, GdkEventButton* e) {
 	if(dynamic_cast<GroupOpenComponent*>(s)==component_open) {
 		close();
-		Workbench::cur()->unselect_all();
+		Document::cur()->unselect_all();
 		component->select(true);
 	}
 	else Module::on_dbl_click(s,e);

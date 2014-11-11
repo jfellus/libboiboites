@@ -12,7 +12,9 @@
 #include <util/utils.h>
 #include "../util/http/HTTPServer.h"
 #include "ZoomableDrawingArea.h"
-
+#include <semaphore.h>
+#include <pthread.h>
+#include "../workbench/Workbench.h"
 
 #undef DEFAULT_PORT
 #define DEFAULT_PORT 12215
@@ -20,20 +22,51 @@
 class BrowserHTTPServer : public HTTPServer {
 public:
 	std::vector<Browser*> browsers;
+	pthread_t thread2 = 0;
+	sem_t sem;
+	bool bAnswering = false;
+	typedef struct { Browser* pending_browser = NULL;	std::string pending_script; } _a;
+	std::list<_a> pending;
+	pthread_mutex_t mut = PTHREAD_MUTEX_INITIALIZER;
 public:
-	BrowserHTTPServer() : HTTPServer(DEFAULT_PORT){}
+	BrowserHTTPServer() : HTTPServer(DEFAULT_PORT){
+		sem_init(&sem, 0, 0);
+		pthread_create(&thread2, NULL, _thread2, this);
+	}
 	virtual ~BrowserHTTPServer() {}
 	virtual std::string answer(const std::string& _url, const std::string& data) {
+		bAnswering = true;
 		std::string url = _url.substr(1);
 		std::string server_id = url.substr(0,url.find("/"));
 		std::string req = url.substr(url.find("/")+1);
 		for(uint i=browsers.size()-1; i>=0; i--) {
-			if(server_id == browsers[i]->server_id) return browsers[i]->answer(req, data);
+			if(server_id == browsers[i]->server_id) {
+				return browsers[i]->answer(req, data);
+			}
 		}
+		bAnswering = false;
+		sem_post(&sem);
 		return url;
 	}
 
 	void add_browser(Browser* b) {browsers.push_back(b);}
+
+	static void* _thread2(void* arg) {
+		BrowserHTTPServer* s = (BrowserHTTPServer*)arg;
+		while(true) {
+			sem_wait(&s->sem);
+			while(!s->pending.empty()) {
+				_a p = s->pending.front(); s->pending.pop_front();
+				p.pending_browser->script(p.pending_script.c_str());
+			}
+		}
+		return 0;
+	}
+	void exec_script_soon(Browser* browser, const char* script) {
+		_a a; a.pending_browser = browser; a.pending_script = script;
+		pending.push_back(a);
+		sem_post(&sem);
+	}
 };
 static BrowserHTTPServer* server = 0;
 static int nbInstances = 0;
@@ -46,6 +79,9 @@ static void on_load_finished (WebKitWebView  *web_view,  WebKitWebFrame *frame, 
 	((Browser*)user_data)->bLoaded = true;
 	((Browser*)user_data)->on_load();
 	if(ZoomableDrawingArea::cur()) ZoomableDrawingArea::cur()->grab_focus();
+}
+static void on_call_update_script(gpointer *o, gpointer *p) {
+	((Browser*)p)->do_update();
 }
 
 
@@ -67,6 +103,10 @@ Browser::Browser(const std::string& server_id) : Widget(gtk_scrolled_window_new(
     }
     if(server) server->add_browser(this);
     nbInstances++;
+
+    if(!g_signal_lookup("call-update-script", G_TYPE_OBJECT))
+    	g_signal_new("call-update-script", G_TYPE_OBJECT, G_SIGNAL_RUN_LAST, 0, NULL, NULL, g_cclosure_marshal_VOID__POINTER, G_TYPE_NONE, 1, G_TYPE_POINTER);
+    g_signal_connect(G_OBJECT(webkitview), "call-update-script", G_CALLBACK(::on_call_update_script), this);
 }
 
 Browser::~Browser() {
@@ -80,11 +120,21 @@ void Browser::open(const std::string& file) {
 	if(ZoomableDrawingArea::cur()) ZoomableDrawingArea::cur()->grab_focus();
 }
 
+
 void Browser::script(const char* script) {
-	webkit_web_view_execute_script(webkitview, script);
-	if(ZoomableDrawingArea::cur()) ZoomableDrawingArea::cur()->grab_focus();
+		if(bRuningScript) return;
+		else {
+			bRuningScript = true;
+			webkit_web_view_execute_script(webkitview, script);
+			if(ZoomableDrawingArea::cur()) ZoomableDrawingArea::cur()->grab_focus();
+			bRuningScript = false;
+		}
 }
 
 bool Browser::is_loaded() {
 	return bLoaded;
+}
+
+void Browser::update() {
+	g_signal_emit_by_name(G_OBJECT(webkitview), "call-update-script", this);
 }

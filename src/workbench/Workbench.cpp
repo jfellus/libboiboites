@@ -12,6 +12,7 @@
 #include "../creators/ChangeGroupCreator.h"
 #include "../widget/PropertiesForm.h"
 #include "../widget/InfoForm.h"
+#include <semaphore.h>
 
 
 static Workbench* _cur = 0;
@@ -43,13 +44,10 @@ void workbench_set_status(const std::string& text) {
 // CALLBACKS //
 ///////////////
 
-GLADE_CALLBACK {
-	void on_new() {				Workbench::cur()->new_document();		}
-	void on_open() {				Workbench::cur()->open_dialog();		}
-	void on_close() {				Workbench::cur()->close();				}
-}
-
-static void on_saveas()  {Workbench::cur()->save_dialog();}
+static void on_new() 	{	Workbench::cur()->new_document();	}
+static void on_open() 	{	Workbench::cur()->open();			}
+static void on_close() 	{	Workbench::cur()->close();			}
+static void on_saveas()	{	Workbench::cur()->save_as();	}
 
 static void on_group() {Workbench::cur()->group_selection();}
 static void on_ungroup() {Workbench::cur()->ungroup_selected();}
@@ -67,6 +65,13 @@ static void on_key_tag3_off()  {Workbench::cur()->remove_selection_tag(3);}
 
 static void on_zoom_all()  {Workbench::cur()->canvas->zoom_all();}
 
+static bool _bUpdating = false;
+static void _on_update() {
+	_bUpdating = true;
+	Workbench::cur()->update(true);
+	_bUpdating = false;
+}
+
 
 
 /////////////////////
@@ -80,32 +85,23 @@ Workbench::Workbench() {
 	win = new Window();
 	ERROR_STREAM = new MessageErrorStream();
 
-	canvas = win->canvas;
 	win->add_tab(properties = new PropertiesForm(), "Properties");
 //	win->add_tab(infoform = new InfoForm(), "Infos");
-	document = new Document();
 
-	document->add_module_selection_listener(this);
-	document->add_link_selection_listener(this);
-	document->add_properties_listener(this);
-
+	canvas = win->canvas;
 	canvas->add_key_listener(new IKeyListener(GDK_KEY_g, GDK_CONTROL_MASK, on_group));
 	canvas->add_key_listener(new IKeyListener(GDK_KEY_G, GDK_CONTROL_MASK | GDK_SHIFT_MASK, on_ungroup));
 	canvas->add_key_listener(new IKeyListener(GDK_KEY_g, 0, on_change_group));
 	canvas->add_key_listener(new IKeyListener(GDK_KEY_Delete, 0, on_delete));
 	canvas->add_key_listener(new IKeyListener(GDK_KEY_m, 0, on_create_module));
 	canvas->add_key_listener(new IKeyListener(GDK_KEY_l, 0, on_create_link));
-
 	canvas->add_key_listener(new IKeyListener(GDK_KEY_KP_1, GDK_CONTROL_MASK, ::on_key_tag1_on));
 	canvas->add_key_listener(new IKeyListener(GDK_KEY_KP_2, GDK_CONTROL_MASK, ::on_key_tag2_on));
 	canvas->add_key_listener(new IKeyListener(GDK_KEY_KP_3, GDK_CONTROL_MASK, ::on_key_tag3_on));
 	canvas->add_key_listener(new IKeyListener(GDK_KEY_KP_End,  GDK_SHIFT_MASK, ::on_key_tag1_off));
 	canvas->add_key_listener(new IKeyListener(GDK_KEY_KP_Down,  GDK_SHIFT_MASK, ::on_key_tag2_off));
 	canvas->add_key_listener(new IKeyListener(GDK_KEY_KP_Page_Down,  GDK_SHIFT_MASK, ::on_key_tag3_off));
-
 	canvas->add_key_listener(new IKeyListener(GDK_KEY_s, GDK_CONTROL_MASK, on_saveas));
-
-	canvas->add_selection_listener(this);
 
 	win->add_menu("_File>_New", on_new);
 	win->add_menu("_File>_Open", on_open);
@@ -114,7 +110,6 @@ Workbench::Workbench() {
 	win->add_menu("_File>_Save as", on_saveas);
 	win->add_menu("_File>__", NULL);
 	win->add_menu("_File>_Quit", gtk_main_quit);
-
 	win->add_menu("_Create>_Module", on_create_module);
 	win->add_menu("_Create>_Link", on_create_link);
 	win->add_menu("_Create>__", NULL);
@@ -133,42 +128,48 @@ Workbench::Workbench() {
 	win->add_menu("_Group>__", NULL);
 	win->add_menu("_Group>_Move selection to group", on_change_group);
 
+	document = new Document();
+	document->add_change_listener(this);
+	document->add_properties_listener(this);
+	canvas->add_selection_listener(this);
+	canvas->add_change_listener(this);
+
+	g_signal_new("update_workbench", G_TYPE_OBJECT, G_SIGNAL_RUN_FIRST, 0, NULL, NULL, NULL, G_TYPE_NONE, 0);
+	g_signal_connect(G_OBJECT(win->widget), "update_workbench", G_CALLBACK(_on_update), this);
 }
 
-Workbench::~Workbench() {
-	delete win;
+Workbench::~Workbench() {	delete win; }
+
+
+/////////////
+// METHODS //
+/////////////
+
+void Workbench::run() {	win->show_all();	gtk_main();}
+
+
+void Workbench::update(bool force) {
+	STATUS(get_selected_modules()->size() << " modules selected\t\t" << get_selected_links()->size() << " links selected");
+	if(canvas) {		canvas->grab_focus();		canvas->repaint(); }
+	if(properties) properties->update(get_selected_modules(), get_selected_links());
+
+	if(bPreventUpdating && !force) return;
+	if(infoform) infoform->update();
+	if(properties) properties->update();
 }
 
-void Workbench::run() {
-	win->show_all();
-	gtk_main();
-}
+
+////////
+// IO //
+////////
 
 
-void Workbench::change_group_selected() {
-	if(!selected_modules.empty()) canvas->start_creator(new ChangeGroupCreator());
-}
-
-void Workbench::group_selection() {
-	if(selected_modules.size()==1 && dynamic_cast<Group*>(selected_modules[0])!=NULL) {
-		ungroup_selected();
-	} else {
-		document->group_selection();
-		canvas->update_layers();
-	}
-}
-
-void Workbench::ungroup_selected() {
-	document->ungroup_selected();
-	canvas->update_layers();
-}
-
-void Workbench::open_dialog() {
+void Workbench::open() {
 	std::string filename = open_file_dialog(win->widget);
 	if(!filename.empty()) open(filename);
 }
 
-void Workbench::save_dialog() {
+void Workbench::save_as() {
 	std::string filename = save_file_dialog(win->widget);
 	if(!filename.empty()) {
 		while(file_exists(filename)) {
@@ -182,51 +183,77 @@ void Workbench::save_dialog() {
 
 
 
+///////////////
+// SELECTION //
+///////////////
+
 void Workbench::unselect_all() {
+	document->unselect_all();
 	canvas->unselect_all();
-	while(selected_modules.size()>0) vector_remove(selected_modules, selected_modules[0]);
-	while(selected_links.size()>0) vector_remove(selected_links, selected_links[0]);
-}
-void Workbench::select(Module* m) {m->select();}
-
-
-void Workbench::start_change_group() {
-	canvas->start_creator(new ChangeGroupCreator());
+	update();
 }
 
-void Workbench::on_module_selected(Module* m, bool bSelected) {
-	if(!canvas->isSelecting) properties->update(&selected_modules, &selected_links);
+void Workbench::unselect_all_modules() {
+	document->unselect_all_modules();
+	update();
+}
 
-	if(bSelected) selected_modules.push_back(m);
-	else vector_remove(selected_modules, m);
+void Workbench::unselect_all_links() {
+	document->unselect_all_links();
+	update();
+}
 
-	if(!canvas->isSelecting) update();
+
+
+//////////////
+// COMMANDS //
+//////////////
+
+void Workbench::change_group_selected() {
+	if(!get_selected_modules()->empty()) canvas->start_creator(new ChangeGroupCreator());
+}
+
+void Workbench::group_selection() {
+	if(get_selected_modules()->size()==1 && dynamic_cast<Group*>((*get_selected_modules())[0])!=NULL) {
+		ungroup_selected();
+	} else {
+		document->group_selection();
+		canvas->update_layers();
+	}
+}
+
+void Workbench::ungroup_selected() {
+	document->ungroup_selected();
+	canvas->update_layers();
 }
 
 void Workbench::delete_selection() {
 	canvas->isSelecting = true;
 	document->delete_selection();
 	canvas->isSelecting = false;
+}
+
+
+
+////////////
+// EVENTS //
+////////////
+
+
+void Workbench::on_selection_change() {
 	update();
 }
 
-void Workbench::update() {
-	STATUS(selected_modules.size() << " modules selected\t\t" << selected_links.size() << " links selected");
-	properties->update(&selected_modules, &selected_links);
-	if(infoform) infoform->update();
-	canvas->grab_focus();
+void Workbench::on_document_change() {
+	update();
+}
+
+void Workbench::on_canvas_change() {
+	update();
+}
+
+void Workbench::on_property_change(IPropertiesElement* m, const std::string& name, const std::string& val) {
 	canvas->repaint();
 }
 
-void Workbench::on_link_selected(Link* m, bool bSelected) {
-	if(!canvas->isSelecting) properties->update(&selected_modules, &selected_links);
-
-	if(bSelected) selected_links.push_back(m);
-	else vector_remove(selected_links, m);
-	if(!canvas->isSelecting) update();
-}
-
-void Workbench::on_selection_event(ISelectable* s) {
-	update();
-}
 

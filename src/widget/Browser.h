@@ -5,8 +5,8 @@
  *      Author: jfellus
  */
 
-#ifndef BROWSER_H_
-#define BROWSER_H_
+#ifndef BROWSERS_H_
+#define BROWSERS_H_
 
 #include <widget/Widget.h>
 #include <webkit/webkit.h>
@@ -18,6 +18,9 @@ public:
 	WebKitWebView* webkitview = 0;
 	std::string server_id;
 	bool bLoaded = false;
+	bool bAnswering = false;
+	bool bRuningScript = false;
+
 public:
 	Browser(const std::string& server_id);
 	virtual ~Browser();
@@ -29,6 +32,9 @@ public:
 
 	bool is_loaded();
 	virtual void on_load() {}
+
+	virtual void update();
+	virtual void do_update() {}
 };
 
-#endif /* BROWSER_H_ */
+#endif /* BROWSERS_H_ */

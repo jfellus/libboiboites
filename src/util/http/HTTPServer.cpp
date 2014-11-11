@@ -44,21 +44,16 @@ static int answer_to_connection (void *cls, struct MHD_Connection *connection,
 	}
 	else s = ((HTTPServer*)cls)->answer(url, "");
 
-	static pthread_mutex_t mut = PTHREAD_MUTEX_INITIALIZER;
-	pthread_mutex_lock(&mut);
 	struct MHD_Response *response;
 	int ret;
-	static char* ss = 0;
-	if(ss) delete ss;
-	ss = new char[s.length()+1];
+	char* ss = new char[s.length()+1];
 	strcpy(ss, s.c_str()); ss[s.length()] = 0;
-	response =  MHD_create_response_from_buffer (strlen(ss), ss, MHD_RESPMEM_PERSISTENT);
+	response =  MHD_create_response_from_buffer (strlen(ss), ss, MHD_RESPMEM_MUST_FREE);
 	MHD_add_response_header(response, "Access-Control-Allow-Origin", "*");
 	MHD_add_response_header(response, "Access-Control-Allow-Methods", "POST, GET, OPTIONS");
 	MHD_add_response_header(response, "Access-Control-Allow-Headers", "X-Requested-With");
 	ret = MHD_queue_response (connection, MHD_HTTP_OK, response);
 	MHD_destroy_response (response);
-	pthread_mutex_unlock(&mut);
 
 	return ret;
 }

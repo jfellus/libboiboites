@@ -42,9 +42,9 @@ std::ostream& operator<<(std::ostream& os, Property* a);
 
 template <class T> class TProperty : public Property {
 public:
-	T& val;
+	T val;
 public:
-	TProperty(std::string name, T& val) : Property(name), val(val) { set_undefined(false); }
+	TProperty(std::string name, T val) : Property(name), val(val) { set_undefined(false); }
 	virtual std::string get_value_as_string() { return undefined ? "???" : toString(val);}
 	virtual void set_value_from_string(const std::string& s) {
 		fromString(s, val);  set_undefined(false);
@@ -68,7 +68,7 @@ public:
 	}
 
 	template <typename T> void add(std::string name, T& f, const std::string& format = "") {add(new TProperty<T>(name, f), format);}
-	void add(std::string name, const char* s, const std::string& format = "") {add(new TProperty<std::string>(name, *(new std::string(s))), format);}
+	void add(std::string name, const char* s, const std::string& format = "") {add(new TProperty<std::string>(name, std::string(s)), format);}
 
 	void set_from_string(const std::string& name, const std::string& val) {
 		Property* p = get(name);

@@ -127,9 +127,16 @@ public:
 		return get_handle_bounds(get_bounds()).contains(x,y);
 	}
 
+	virtual void select(bool single) {
+		if(single) Component::select(single);
+	}
+
+	virtual bool is_in(const Rectangle& r) {return false;}
+
 	virtual bool hasPoint(double x, double y, bool bInside) {
 		if(!bInside) return hasPoint(x,y);
 		return get_bounds().contains(x,y);
+		return false;
 	}
 
 	virtual void translate(double dx, double dy) {

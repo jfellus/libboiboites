@@ -62,18 +62,25 @@ std::ostream& operator<<(std::ostream& os, Module* a) {
 }
 
 void Module::select() {
-	if(has_selected_ancestor()) {unselect(); return;}
-	if(!bSelected) {
-		component->select(false);
-		ISelectable::select();
-	}
-	bSelected = true;
+	//if(has_selected_ancestor()) {unselect(); return;}
+	if(bSelected) return;
+	if(component) component->select(false);
+	ISelectable::select();
+}
+
+void Module::unselect() {
+	if(!bSelected) return;
+	if(component)  component->unselect();
+	ISelectable::unselect();
 }
 
 void Module::on_selection_event(ISelectable* s) {
 	if(s!=component) return;
-	if(s->bSelected && has_selected_ancestor()) {unselect(); return;}
-	if(s->bSelected) ISelectable::select(); else ISelectable::unselect();
+	//if(s->bSelected && has_selected_ancestor()) {unselect(); ISelectable::unselect(); return;}
+	if(s->bSelected)
+		{ ISelectable::select(false); select();}
+	else
+		{ ISelectable::unselect();  unselect();}
 }
 
 bool Module::has_selected_ancestor() {

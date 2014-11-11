@@ -20,7 +20,6 @@ void LinkCreator::create(double x, double y) {
 		if(!c) return;
 		Module* m = (Module*) c->get_user_data("Module");
 		if(m) src = m;
-		repaint();
 	} else {
 		Component* c = canvas->get_selectable_component_at(x,y);
 		if(!c) return;
