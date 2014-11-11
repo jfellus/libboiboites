@@ -18,6 +18,7 @@ Link::Link(Module* src, Module* dst) {
 }
 
 Link::~Link() {
+	unselect();
 	Document::cur()->remove_link(this);
 	delete component;
 }
