@@ -40,7 +40,10 @@ public:
 	void close();
 	void show_all() {gtk_widget_show_all(widget);}
 
-	void add_menu(const char* menustr, void (*callback)(), int accelerator_key = 0);
+	void add_menu(const char* menustr, void (*callback)(), int pos = -1, int accelerator_key = 0);
+	int get_menu_pos(const char* menustr);
+	void enable_menu(const char* menustr, bool bEnable = true);
+
 	void add_tab(Widget* w, const std::string& title);
 
 	void set_status(const std::string& text);

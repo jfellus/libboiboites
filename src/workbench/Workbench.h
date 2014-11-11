@@ -44,6 +44,19 @@ public:
 
 	std::vector<Module*>* get_selected_modules() {return &Document::cur()->selected_modules;}
 	std::vector<Link*>* get_selected_links() {return &Document::cur()->selected_links;}
+	inline uint get_selected_links_count() {return get_selected_links()->size();}
+	inline uint get_selected_modules_count() {return get_selected_modules()->size();}
+	Module* get_single_selected_module() {
+		if(get_selected_links_count()!=0) return NULL;
+		if(get_selected_modules_count()!=1) return NULL;
+		return (*get_selected_modules())[0];
+	}
+	Link* get_single_selected_links() {
+			if(get_selected_modules_count()!=0) return NULL;
+			if(get_selected_links_count()!=1) return NULL;
+			return (*get_selected_links())[0];
+	}
+
 
 	void allow_update() {bPreventUpdating = false;}
 	void prevent_update() {bPreventUpdating = true;}
@@ -82,6 +95,7 @@ public:
 
 	virtual void create_module() = 0;
 	virtual void create_link() = 0;
+	virtual void reconnect_link();
 
 
 	// Runtime

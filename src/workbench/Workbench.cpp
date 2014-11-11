@@ -10,6 +10,7 @@
 #include "../creators/LinkCreator.h"
 #include "../creators/ModuleCreator.h"
 #include "../creators/ChangeGroupCreator.h"
+#include "../creators/LinkReconnectCreator.h"
 #include "../widget/PropertiesForm.h"
 #include "../widget/InfoForm.h"
 #include <semaphore.h>
@@ -55,6 +56,8 @@ static void on_change_group() {Workbench::cur()->change_group_selected();}
 static void on_delete() {Workbench::cur()->delete_selection();}
 static void on_create_module() {Workbench::cur()->create_module();}
 static void on_create_link()  {Workbench::cur()->create_link();}
+static void on_reconnect_link()  {Workbench::cur()->reconnect_link();}
+
 
 static void on_key_tag1_on()  {Workbench::cur()->add_selection_tag(1);}
 static void on_key_tag2_on()  {Workbench::cur()->add_selection_tag(2);}
@@ -95,6 +98,7 @@ Workbench::Workbench() {
 	canvas->add_key_listener(new IKeyListener(GDK_KEY_Delete, 0, on_delete));
 	canvas->add_key_listener(new IKeyListener(GDK_KEY_m, 0, on_create_module));
 	canvas->add_key_listener(new IKeyListener(GDK_KEY_l, 0, on_create_link));
+	canvas->add_key_listener(new IKeyListener(GDK_KEY_r, 0, on_reconnect_link));
 	canvas->add_key_listener(new IKeyListener(GDK_KEY_KP_1, GDK_CONTROL_MASK, ::on_key_tag1_on));
 	canvas->add_key_listener(new IKeyListener(GDK_KEY_KP_2, GDK_CONTROL_MASK, ::on_key_tag2_on));
 	canvas->add_key_listener(new IKeyListener(GDK_KEY_KP_3, GDK_CONTROL_MASK, ::on_key_tag3_on));
@@ -220,19 +224,27 @@ void Workbench::group_selection() {
 		document->group_selection();
 		canvas->update_layers();
 	}
+	update();
 }
 
 void Workbench::ungroup_selected() {
 	document->ungroup_selected();
 	canvas->update_layers();
+	update();
 }
 
 void Workbench::delete_selection() {
 	canvas->isSelecting = true;
 	document->delete_selection();
 	canvas->isSelecting = false;
+	update();
 }
 
+void Workbench::reconnect_link() {
+	if(get_selected_modules()->empty() && get_selected_links()->size()==1) {
+		canvas->start_creator(new LinkReconnectCreator((*get_selected_links())[0]));
+	}
+}
 
 
 ////////////

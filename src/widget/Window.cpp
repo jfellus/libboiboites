@@ -62,7 +62,38 @@ Window::~Window() {
 	g_object_unref (G_OBJECT (builder));
 }
 
-void Window::add_menu(const char* menustr, void (*callback)(), int accelerator_key) {
+int Window::get_menu_pos(const char* menustr) {
+	int index = -1;
+	GtkWidget* curmenu = menubar;
+	GtkWidget* item = NULL;
+	char str[512]; strcpy(str, menustr);
+	char *curstr = strtok(str, "/>");
+	for(int i=0; curstr!=0; i++) {
+		if(i!=0) {
+			curmenu = gtk_menu_item_get_submenu(GTK_MENU_ITEM(item));
+			if(!curmenu) return -1;
+		}
+
+		item = NULL;
+		index = 0;
+		GList* l = gtk_container_get_children(GTK_CONTAINER(curmenu));
+		for(GList * elem = l; elem; elem = elem->next) {
+			GtkMenuItem* e = GTK_MENU_ITEM(elem->data);
+			if(!strcmp(curstr,gtk_menu_item_get_label(e))) {
+				item = GTK_WIDGET(e);
+				break;
+			}
+			else index++;
+		}
+		if(item==NULL) {return -1;}
+		curstr = strtok(NULL, "/>");
+	}
+	if(item==NULL) return -1;
+	return index;
+}
+
+
+void Window::add_menu(const char* menustr, void (*callback)(), int pos, int accelerator_key) {
 	GtkWidget* curmenu = menubar;
 	GtkWidget* item = NULL;
 	bool bSeparator = false;
@@ -87,12 +118,43 @@ void Window::add_menu(const char* menustr, void (*callback)(), int accelerator_k
 			} else {
 				item = gtk_menu_item_new_with_mnemonic(curstr);
 			}
-			gtk_menu_shell_append(GTK_MENU_SHELL(curmenu), item);
+			if(pos==-1) {	gtk_menu_shell_append(GTK_MENU_SHELL(curmenu), item); }
+			else { gtk_menu_shell_insert(GTK_MENU_SHELL(curmenu), item, pos); }
 		}
 		curstr = strtok(NULL, "/>");
 	}
 
 	if(!bSeparator) g_signal_connect(G_OBJECT(item), "activate", G_CALLBACK(callback), NULL);
+}
+
+void Window::enable_menu(const char* menustr, bool bEnable) {
+	int index = -1;
+	GtkWidget* curmenu = menubar;
+	GtkWidget* item = NULL;
+	char str[512]; strcpy(str, menustr);
+	char *curstr = strtok(str, "/>");
+	for(int i=0; curstr!=0; i++) {
+		if(i!=0) {
+			curmenu = gtk_menu_item_get_submenu(GTK_MENU_ITEM(item));
+			if(!curmenu) return;
+		}
+
+		item = NULL;
+		index = 0;
+		GList* l = gtk_container_get_children(GTK_CONTAINER(curmenu));
+		for(GList * elem = l; elem; elem = elem->next) {
+			GtkMenuItem* e = GTK_MENU_ITEM(elem->data);
+			if(!strcmp(curstr,gtk_menu_item_get_label(e))) {
+				item = GTK_WIDGET(e);
+				break;
+			}
+			else index++;
+		}
+		if(item==NULL) return;
+		curstr = strtok(NULL, "/>");
+	}
+	if(item==NULL) return;
+	gtk_widget_set_sensitive(GTK_WIDGET(item), bEnable);
 }
 
 

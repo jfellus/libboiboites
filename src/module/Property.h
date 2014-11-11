@@ -53,6 +53,20 @@ public:
 	virtual Property* copy() { return new TProperty<T>(name, val); }
 };
 
+template <class T> class TPropertyRef : public Property {
+public:
+	T& val;
+public:
+	TPropertyRef(std::string name, T& val) : Property(name), val(val) { set_undefined(false); }
+	virtual std::string get_value_as_string() { return undefined ? "???" : toString(val);}
+	virtual void set_value_from_string(const std::string& s) {
+		fromString(s, val);  set_undefined(false);
+	}
+
+	virtual Property* copy() { return new TProperty<T>(name, val); }
+};
+
+
 
 class Properties  {
 public:
@@ -69,6 +83,9 @@ public:
 
 	template <typename T> void add(std::string name, T& f, const std::string& format = "") {add(new TProperty<T>(name, f), format);}
 	void add(std::string name, const char* s, const std::string& format = "") {add(new TProperty<std::string>(name, std::string(s)), format);}
+
+	template <typename T> void add_ref(std::string name, T& f, const std::string& format = "") {add(new TPropertyRef<T>(name, f), format);}
+	void add_ref(std::string name, const char* s, const std::string& format = "") {add(new TPropertyRef<std::string>(name, * (new std::string(s))), format);}
 
 	void set_from_string(const std::string& name, const std::string& val) {
 		Property* p = get(name);
