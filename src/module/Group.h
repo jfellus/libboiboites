@@ -65,6 +65,9 @@ public:
 	virtual void remove_class(const std::string& cls);
 
 
+	virtual void attach();
+	virtual void detach(bool bSlave = false);
+
 	virtual void set_layer(int l);
 
 	virtual void on_selection_event(ISelectable* s);

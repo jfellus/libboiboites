@@ -18,6 +18,7 @@
 
 class Group;
 class IPropertiesListener;
+class Link;
 
 class Module : public ISelectable, public ISelectionListener, public IPropertiesElement {
 public:
@@ -28,6 +29,11 @@ public:
 
 
 	bool visible = false;
+	bool bAttached = false;
+
+	std::vector<Link*> in_links;
+	std::vector<Link*> out_links;
+
 public:
 	Module();
 	virtual ~Module();
@@ -62,6 +68,10 @@ public:
 
 	bool has_selected_ancestor();
 
+
+	virtual void attach();
+	virtual void detach(bool bSlave = false);
+
 	virtual void set_layer(int l) { if(component) component->layer = l; }
 	float get_layer() {return component->layer;}
 
@@ -69,6 +79,9 @@ public:
 	virtual void create_component(const char* component_spec);
 	friend std::ostream& operator<<(std::ostream& os, Module* a);
 	virtual void dump(std::ostream& os) { os << "Module " << (void*)this; }
+
+public:
+	bool bDetachedSlave = false;
 };
 
 std::ostream& operator<<(std::ostream& os, Module* a);

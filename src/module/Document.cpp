@@ -7,7 +7,15 @@
 
 #include "Document.h"
 #include "../workbench/Workbench.h"
-
+#include "../commands/CommandToggleTag.h"
+#include "../commands/CommandAddTag.h"
+#include "../commands/CommandRemoveTag.h"
+#include "../commands/CommandOpenGroup.h"
+#include "../commands/CommandCloseGroup.h"
+#include "../commands/CommandChangeGroup.h"
+#include "../commands/CommandUngroup.h"
+#include "../commands/CommandGroup.h"
+#include "../commands/CommandDelete.h"
 
 static Document* _cur = 0;
 Document* Document::cur() {	return _cur;}
@@ -55,9 +63,14 @@ Link* Document::add_link(Link* l) {
 	return l;
 }
 
-void Document::remove_module(Module* m) {
-	for(uint i=0; i<links.size(); i++) {
-		if(links[i]->src==m || links[i]->dst==m) {delete links[i];i--;}
+void Document::remove_module(Module* m, bool bDeleteConnectedLinks) {
+	for(uint i=0; i<m->in_links.size(); i++) {
+		if(bDeleteConnectedLinks) {delete m->in_links[i]; i--;}
+		else m->in_links[i]->detach(true);
+	}
+	for(uint i=0; i<m->out_links.size(); i++) {
+		if(bDeleteConnectedLinks) {delete m->out_links[i]; i--;}
+		else m->out_links[i]->detach(true);
 	}
 	vector_remove(modules, m);
 }
@@ -93,30 +106,13 @@ void Document::unselect_all_links() {
 
 
 void Document::delete_selection() {
-	while(!selected_modules.empty()) {
-		Module* m = selected_modules[0];
-		m->unselect();
-		vector_remove(selected_modules, m);
-		vector_remove(modules, m);
-		delete m;
-	}
-	while(!selected_links.empty()) {
-		Link* l = selected_links[0];
-		l->unselect();
-		vector_remove(selected_links, l);
-		vector_remove(links, l);
-		delete l;
-	}
-	fire_change_event();
+	(new CommandDelete(this))->execute();
 }
 
 
 void Document::group_selection() {
 	// No group with 0 element
 	if(selected_modules.size()<1) return;
-
-	Group* g = new Group();
-	g->realize();
 
 	// Close any selected group
 	for(uint i=0; i<modules.size(); i++) {
@@ -129,75 +125,48 @@ void Document::group_selection() {
 	for(uint i=0; i<modules.size(); i++) {
 		if(modules[i]->visible && modules[i]->bSelected) {
 			if(!parentFound) {parent = modules[i]->parent; parentFound = true;}
-			else if(modules[i]->parent!=parent) {ERROR("No common parent : CANCEL !"); delete g; return;}
+			else if(modules[i]->parent!=parent) {ERROR("No common parent : CANCEL !"); return;}
 		}
 	}
 
 	// Add elements to group
+	std::list<Module*> modules_to_add;
 	for(uint i=0; i<modules.size(); i++) {
 		if(modules[i]->visible && modules[i]->bSelected) {
-			g->add(modules[i]);
+			modules_to_add.push_back(modules[i]);
 		}
 	}
 
 	// If finally we only added 0 element, group is cancelled
-	if(g->children.size()<1) {delete g; return;}
+	if(modules_to_add.empty()) return;
 
-	if(parent) parent->add(g);
-	g->close();
-
-	update_links_layers();
-	fire_change_event();
+	(new CommandGroup(this, parent, modules_to_add))->execute();
 }
 
 void Document::ungroup_selected() {
-	for(uint i=0; i<selected_modules.size(); i++) {
-		Group* g = dynamic_cast<Group*>(selected_modules[i]);
-		if(!g) continue;
-		g->ungroup();
-	}
-
-	update_links_layers();
-	fire_change_event();
+	(new CommandUngroup(this))->execute();
 }
 
 void Document::change_selection_group(Group* g) {
-	for(uint i=0; i<selected_modules.size(); i++) {
-		if(selected_modules[i]->parent) {
-			selected_modules[i]->parent->remove(selected_modules[i]);
-		}
-		if(g) g->add(selected_modules[i]);
-	}
-	update_links_layers();
-	fire_change_event();
+	(new CommandChangeGroup(this, g))->execute();
 }
 
+void Document::open_group(Group* g) {
+	(new CommandOpenGroup(this, g))->execute();
+}
+
+void Document::close_group(Group* g) {
+	(new CommandCloseGroup(this, g))->execute();
+}
 
 
 /////////////
 // TAGGING //
 /////////////
 
-void Document::toggle_selection_tag(int i) {
-	std::string cls = TOSTRING("tag_" << i);
-	for(uint i=0; i<selected_modules.size(); i++) selected_modules[i]->toggle_class(cls);
-	for(uint i=0; i<selected_links.size(); i++) selected_links[i]->toggle_class(cls);
-	fire_change_event();
-}
-
-void Document::add_selection_tag(int i) {
-	std::string cls = TOSTRING("tag_" << i);
-	for(uint i=0; i<selected_modules.size(); i++) selected_modules[i]->add_class(cls);
-	for(uint i=0; i<selected_links.size(); i++) selected_links[i]->add_class(cls);
-	fire_change_event();
-}
-
-void Document::remove_selection_tag(int i) {
-	std::string cls = TOSTRING("tag_" << i);
-	for(uint i=0; i<selected_modules.size(); i++) selected_modules[i]->remove_class(cls);
-	for(uint i=0; i<selected_links.size(); i++) selected_links[i]->remove_class(cls);
-	fire_change_event();
-}
+void Document::toggle_selection_tag(int i) 	{	(new CommandToggleTag(this, i))->execute(); }
+void Document::add_selection_tag(int i) 	{	(new CommandAddTag(this, i))->execute();	}
+void Document::remove_selection_tag(int i) 	{	(new CommandRemoveTag(this, i))->execute();	}
 
 
 
@@ -207,7 +176,7 @@ void Document::remove_selection_tag(int i) {
 
 void Document::on_dbl_click(ISelectable* s, GdkEventButton* e) {
 	Group* g = dynamic_cast<Group*>(s);
-	if(g) g->open();
+	if(g) open_group(g);
 }
 
 void Document::on_property_change(IPropertiesElement* m, const std::string& name, const std::string& val) {

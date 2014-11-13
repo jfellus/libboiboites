@@ -65,7 +65,7 @@ public:
 	Group* get_group_at(double x, double y);
 
 	Module* add_module(Module* m);
-	void remove_module(Module* m);
+	void remove_module(Module* m, bool bDeleteConnectedLinks = true);
 	Link* add_link(Link* l);
 	void remove_link(Link* l);
 
@@ -84,6 +84,8 @@ public:
 
 	void group_selection();
 	void ungroup_selected();
+	void open_group(Group* g);
+	void close_group(Group* g);
 	void change_selection_group(Group* g);
 
 

@@ -19,6 +19,8 @@ public:
 	Module *src, *dst;
 	std::string text;
 
+	bool bAttached = false;
+
 public:
 	Link() {component = NULL;src=dst=NULL;}
 	Link(Module* src, Module* dst);
@@ -44,12 +46,18 @@ public:
 		if(s->bSelected) ISelectable::select(); else ISelectable::unselect();
 	}
 
+	virtual void attach();
+	virtual void detach(bool bSlave = false);
+
 	virtual void toggle_class(const std::string& cls) {	component->toggle_class(cls);	}
 	virtual void add_class(const std::string& cls) {	component->add_class(cls);	}
 	virtual void remove_class(const std::string& cls) {	component->remove_class(cls);	}
 
 	virtual void show() {component->show();}
 	virtual void hide() {unselect(); component->hide();}
+
+public:
+	bool bDetachedSlave = false;
 };
 
 

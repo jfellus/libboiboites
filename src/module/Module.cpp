@@ -20,6 +20,7 @@
 Module::Module() {
 	component = NULL;
 	if(Document::cur()) Document::cur()->add_module(this);
+	bAttached = true;
 }
 
 Module::~Module() {
@@ -89,4 +90,33 @@ bool Module::has_selected_ancestor() {
 	return parent->has_selected_ancestor();
 }
 
+
+void Module::attach() {
+	if(bAttached) return;
+	bAttached = true;
+	bDetachedSlave = false;
+	if(parent) parent->attach();
+	component->show();
+	Document* doc = Document::cur();
+	doc->modules.push_back(this);
+	for(uint j=0; j<in_links.size(); j++)
+		if(in_links[j]->bDetachedSlave && in_links[j]->src->bAttached) in_links[j]->attach();
+	for(uint j=0; j<out_links.size(); j++)
+		if(out_links[j]->bDetachedSlave && out_links[j]->dst->bAttached) out_links[j]->attach();
+	visible = true;
+}
+
+void Module::detach(bool bSlave) {
+	if(!bAttached) return;
+	bAttached = false;
+	bDetachedSlave = bSlave;
+	unselect();
+	if(parent!=NULL) {
+		Group* g = parent;
+		if(g->children.size()==1 && g->children[0]==this && !g->bDeleted) g->detach(bSlave);
+	}
+	component->hide();
+	Document::cur()->remove_module(this, false);
+	visible = false;
+}
 

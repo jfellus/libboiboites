@@ -51,7 +51,12 @@ void Group::ungroup() {
 		if(parent) parent->add(children[i]);
 	}
 	children.clear();
-	delete this;
+	unselect();
+	bDeleted = true;
+	if(parent!=NULL) {	Group* g = parent;	g->remove(this); }
+	Document::cur()->remove_module(this);
+	component->hide();
+	component_open->hide();
 }
 
 void Group::create_component(const char* component_spec) {
@@ -158,9 +163,7 @@ Rectangle Group::get_bounds() {
 
 void Group::on_dbl_click(ISelectable* s, GdkEventButton* e) {
 	if(dynamic_cast<GroupOpenComponent*>(s)==component_open) {
-		close();
-		Document::cur()->unselect_all();
-		component->select(true);
+		Document::cur()->close_group(this);
 	}
 	else Module::on_dbl_click(s,e);
 }
@@ -231,3 +234,15 @@ void Group::realize() {
 	component_open->layer = -0.5;
 }
 
+void Group::detach(bool bSlave) {
+	Module::detach();
+	for(uint i = 0; i<children.size(); i++) children[i]->detach(true);
+	if(component_open) component_open->hide();
+}
+
+void Group::attach() {
+	Module::attach();
+	for(uint i = 0; i<children.size(); i++) if(children[i]->bDetachedSlave) children[i]->attach();
+	if(is_opened() && component_open) {component_open->show(); component->hide(); }
+	else if(!is_opened() && component) {component->show(); component_open->hide(); }
+}
