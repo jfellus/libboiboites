@@ -8,6 +8,7 @@
 #include "LinkReconnectCreator.h"
 #include <ZoomableDrawingArea.h>
 #include <Component.h>
+#include "../commands/CommandLinkReconnect.h"
 
 
 LinkReconnectCreator::LinkReconnectCreator(Link* link) {
@@ -40,13 +41,13 @@ void LinkReconnectCreator::create(double x, double y) {
 		Component* c = canvas->get_selectable_component_at(x,y);
 		if(!c) return;
 		Module* m = (Module*) c->get_user_data("Module");
-		if(m) link->connect(m, link->dst);
+		if(m) (new CommandLinkReconnect(link, m, link->dst))->execute();
 		end();
 	} else {
 		Component* c = canvas->get_selectable_component_at(x,y);
 		if(!c) return;
 		Module* m = (Module*) c->get_user_data("Module");
-		if(m) link->connect(link->src, m);
+		if(m) (new CommandLinkReconnect(link, link->src, m))->execute();
 		end();
 	}
 }

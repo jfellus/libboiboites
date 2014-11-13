@@ -31,8 +31,8 @@
 Group::Group() {
 	text = "new_group";
 
-	set_property("timescale", "no"); // TODO : MOVE TO promethe-specific stuff
-	set_property("name", text);
+	properties.set_from_string("timescale", "no"); // TODO : MOVE TO promethe-specific stuff
+	properties.set_from_string("name", text);
 
 	add_properties_listener(this);
 }

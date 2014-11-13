@@ -14,6 +14,7 @@
 #include "../widget/PropertiesForm.h"
 #include "../widget/InfoForm.h"
 #include <semaphore.h>
+#include <commands/Command.h>
 
 
 static Workbench* _cur = 0;
@@ -49,6 +50,9 @@ static void on_new() 	{	Workbench::cur()->new_document();	}
 static void on_open() 	{	Workbench::cur()->open();			}
 static void on_close() 	{	Workbench::cur()->close();			}
 static void on_saveas()	{	Workbench::cur()->save_as();	}
+
+static void on_undo() { CommandStack::undo(); Workbench::cur()->win->enable_menu("_Edit>_Undo",CommandStack::can_undo());}
+static void on_redo() { CommandStack::redo(); Workbench::cur()->win->enable_menu("_Edit>_Redo",CommandStack::can_redo());}
 
 static void on_group() {Workbench::cur()->group_selection();}
 static void on_ungroup() {Workbench::cur()->ungroup_selected();}
@@ -91,6 +95,9 @@ Workbench::Workbench() {
 	win->add_tab(properties = new PropertiesForm(), "Properties");
 //	win->add_tab(infoform = new InfoForm(), "Infos");
 
+
+	// Key shortcuts
+
 	canvas = win->canvas;
 	canvas->add_key_listener(new IKeyListener(GDK_KEY_g, GDK_CONTROL_MASK, on_group));
 	canvas->add_key_listener(new IKeyListener(GDK_KEY_G, GDK_CONTROL_MASK | GDK_SHIFT_MASK, on_ungroup));
@@ -107,6 +114,9 @@ Workbench::Workbench() {
 	canvas->add_key_listener(new IKeyListener(GDK_KEY_KP_Page_Down,  GDK_SHIFT_MASK, ::on_key_tag3_off));
 	canvas->add_key_listener(new IKeyListener(GDK_KEY_s, GDK_CONTROL_MASK, on_saveas));
 
+
+	// Menus
+
 	win->add_menu("_File>_New", on_new);
 	win->add_menu("_File>_Open", on_open);
 	win->add_menu("_File>_Close", on_close);
@@ -114,11 +124,33 @@ Workbench::Workbench() {
 	win->add_menu("_File>_Save as", on_saveas);
 	win->add_menu("_File>__", NULL);
 	win->add_menu("_File>_Quit", gtk_main_quit);
+
+	win->add_menu("_Edit>_Undo",on_undo);
+		win->enable_menu("_Edit>_Undo",CommandStack::can_undo());
+	win->add_menu("_Edit>_Redo",on_redo);
+		win->enable_menu("_Edit>_Redo",CommandStack::can_redo());
+		class CSL : public CommandStack::Listener {
+		public:
+			Window* w; CSL(Window* w) : w(w){} virtual ~CSL() {}
+			virtual void on_command_stack_change() {
+				w->enable_menu("_Edit>_Undo",CommandStack::can_undo());
+				w->enable_menu("_Edit>_Redo",CommandStack::can_redo());
+			}
+		};
+		CommandStack::add_listener(new CSL(win));
+	win->add_menu("_Edit>__",NULL);
+	win->add_menu("_Edit>_Delete selection",on_delete);
+
 	win->add_menu("_Create>_Module", on_create_module);
 	win->add_menu("_Create>_Link", on_create_link);
 	win->add_menu("_Create>__", NULL);
 	win->add_menu("_Create>_Group from selection", on_group);
-	win->add_menu("_Edit>_Delete selection",on_delete);
+
+	win->add_menu("_Group>_Group selection", on_group);
+	win->add_menu("_Group>_Ungroup selection", on_ungroup);
+	win->add_menu("_Group>__", NULL);
+	win->add_menu("_Group>_Move selection to group", on_change_group);
+
 	win->add_menu("_View>Zoom All" , on_zoom_all);
 	win->add_menu("_View>__", NULL);
 	win->add_menu("_View>Add tag 1 to selection" , on_key_tag1_on);
@@ -127,10 +159,6 @@ Workbench::Workbench() {
 	win->add_menu("_View>Remove tag 1 to selection" , on_key_tag1_off);
 	win->add_menu("_View>Remove tag 2 to selection" , on_key_tag2_off);
 	win->add_menu("_View>Remove tag 3 to selection" , on_key_tag3_off);
-	win->add_menu("_Group>_Group selection", on_group);
-	win->add_menu("_Group>_Ungroup selection", on_ungroup);
-	win->add_menu("_Group>__", NULL);
-	win->add_menu("_Group>_Move selection to group", on_change_group);
 
 	document = new Document();
 	document->add_change_listener(this);

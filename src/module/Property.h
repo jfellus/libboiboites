@@ -62,6 +62,7 @@ public:
 	virtual void set_value_from_string(const std::string& s) {
 		fromString(s, val);  set_undefined(false);
 	}
+	void set(T& v) {fromString(toString(v),val);}
 
 	virtual Property* copy() { return new TProperty<T>(name, val); }
 };
@@ -95,10 +96,10 @@ public:
 
 	template <typename T> void set(std::string name, T& f) {
 		Property* p = get(name);
-		if(!p) {add(new TProperty<T>(name, f)); return;}
-		TProperty<T>* pf = dynamic_cast<TProperty<T>*>(p);
+		if(!p) {add(new TPropertyRef<T>(name, f)); return;}
+		TPropertyRef<T>* pf = dynamic_cast<TPropertyRef<T>*>(p);
 		if(!pf) throw "Wrong argument";
-		pf->val = f;
+		pf->set(f);
 	}
 
 	Property* get(const std::string& name) {
@@ -163,6 +164,7 @@ public:
 
 	void add_properties_listener(IPropertiesListener* l) { propertiesListeners.push_back(l);}
 	void set_property(const std::string& name, const std::string& value);
+	std::string get_property(const std::string& name) {return properties.get(name)->get_value_as_string();}
 };
 
 

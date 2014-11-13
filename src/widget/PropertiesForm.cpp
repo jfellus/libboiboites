@@ -7,6 +7,7 @@
 
 #include "PropertiesForm.h"
 #include "../workbench/Workbench.h"
+#include "../commands/CommandPropertySetMultiple.h"
 
 void PropertiesForm::update(std::vector<Module*>* selected_modules, std::vector<Link*>* selected_links) {
 	this->selected_modules = selected_modules;
@@ -91,17 +92,9 @@ std::string PropertiesForm::answer(const std::string& request, const std::string
 	}
 	else if(str_starts_with(request, "set/")) {
 		std::string field = str_between(request, "set/", "=");
-		if(selected_links->empty()) {
-			for(uint i=0; i<selected_modules->size(); i++) {
-				Module* m = selected_modules->at(i);
-				m->set_property(field, data);
-			}
-		} else {
-			for(uint i=0; i<selected_links->size(); i++) {
-				Link* m = selected_links->at(i);
-				m->set_property(field, data);
-			}
-		}
+		if(selected_links->empty())
+			(new CommandPropertySetMultiple(*selected_modules, field, data))->execute();
+		else (new CommandPropertySetMultiple(*selected_links, field, data))->execute();
 		return "ok";
 	} else {
 		if(multiproperties) return multiproperties->to_JSON();

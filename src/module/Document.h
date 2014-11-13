@@ -72,6 +72,7 @@ public:
 	void add_properties_listener(IPropertiesListener* l) 	{ propertiesListeners.push_back(l);}
 	void add_change_listener(IDocumentChangeListener* l) 	{ change_listeners.push_back(l); }
 
+
 	// Selection
 
 	void unselect_all();

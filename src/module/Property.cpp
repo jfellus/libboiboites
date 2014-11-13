@@ -5,11 +5,7 @@
  *      Author: jfellus
  */
 
-
-
-
 #include "Property.h"
-
 
 
 std::ostream& operator<<(std::ostream& os, Properties* a) {
