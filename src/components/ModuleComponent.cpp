@@ -23,9 +23,10 @@ ModuleComponent::ModuleComponent(Module* module, const char* component_spec, std
 
 void ModuleComponent::render(Graphics& g) {
 	ModuleComponentStyle* style = (ModuleComponentStyle*)this->style;
+	g.set_opacity(style->opacity);
 
 	double cursize = 0;
-	for(uint i=0; i<style->glows.size(); i++) {
+	for(uint i=0; !style->noglows && i<style->glows.size(); i++) {
 		cursize += style->glows[i].size;
 		g.circle(get_bounds().at_origin().augment(cursize/canvas->get_zoom()));
 		if(i==0) {

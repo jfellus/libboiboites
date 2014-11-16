@@ -31,8 +31,8 @@
 Group::Group() {
 	text = "new_group";
 
-	properties.set_from_string("timescale", "no"); // TODO : MOVE TO promethe-specific stuff
-	properties.set_from_string("name", text);
+	properties.set("timescale", "no"); // TODO : MOVE TO promethe-specific stuff
+	properties.set("name", &text);
 
 	add_properties_listener(this);
 }
@@ -132,9 +132,23 @@ void Group::translate(double dx, double dy) {
 	}
 }
 
+void Group::lock() {
+	if(bLock) return;
+	Module::lock();
+	component_open->lock();
+}
+
+void Group::unlock() {
+	if(!bLock) return;
+	Module::unlock();
+	component_open->unlock();
+}
+
 void Group::hide() {
 	if(!visible) return;
+	component->lock();
 	component->hide();
+	component_open->lock();
 	component_open->hide();
 	for(uint i=0; i<children.size(); i++) children[i]->hide();
 	visible = false;
@@ -142,6 +156,8 @@ void Group::hide() {
 
 void Group::show() {
 	if(visible) return;
+	component->unlock();
+	component_open->unlock();
 	if(opened) {
 		open();
 		for(uint i=0; i<children.size(); i++) children[i]->show();

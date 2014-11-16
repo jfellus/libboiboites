@@ -21,6 +21,9 @@ public:
 
 	bool bAttached = false;
 
+	bool bLock = false;
+
+
 public:
 	Link() {component = NULL;src=dst=NULL;}
 	Link(Module* src, Module* dst);
@@ -53,8 +56,10 @@ public:
 	virtual void add_class(const std::string& cls) {	component->add_class(cls);	}
 	virtual void remove_class(const std::string& cls) {	component->remove_class(cls);	}
 
-	virtual void show() {component->show();}
-	virtual void hide() {unselect(); component->hide();}
+	virtual void show() {component->unlock(); component->show();}
+	virtual void hide() {unselect(); component->lock(); component->hide();}
+	virtual void lock() { if(bLock) return; component->lock(); bLock = true;}
+	virtual void unlock() { if(!bLock) return; component->unlock(); bLock = false;}
 
 public:
 	bool bDetachedSlave = false;

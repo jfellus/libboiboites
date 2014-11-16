@@ -29,6 +29,8 @@ public:
 	int slashes = 0;
 	int dashed = 0;
 	bool bPretty = false;
+	float opacity = 1;
+	bool noglows = false;
 
 	class Glow {
 	public:
@@ -54,6 +56,8 @@ public:
 		slashes = dashed = 0;
 		glows.clear();
 		bPretty = false;
+		opacity = 1;
+		noglows = false;
 	}
 
 	virtual const char* name() {return "link";}
@@ -71,7 +75,9 @@ public:
 			else if(e->property=="slashes") fromString(e->value, slashes);
 			else if(e->property=="dashed") fromString(e->value, dashed);
 			else if(e->property=="glow") glows.push_back(Glow(e->value));
+			else if(e->property=="noglow") noglows = (e->value=="true");
 			else if(e->property=="pretty") fromString(e->value, bPretty);
+			else if(e->property=="opacity") fromString(e->value, opacity);
 		}
 	}
 };

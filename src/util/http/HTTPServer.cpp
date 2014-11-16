@@ -16,6 +16,7 @@
 #include "HTTPServer.h"
 #include <string>
 #include <util/utils.h>
+#include "../../workbench/Workbench.h"
 
 
 static int answer_to_connection (void *cls, struct MHD_Connection *connection,
@@ -37,7 +38,9 @@ static int answer_to_connection (void *cls, struct MHD_Connection *connection,
 			return MHD_YES;
 		}
 		else {
+			Workbench::cur()->prevent_update();
 			s = ((HTTPServer*)cls)->answer(url, (*((std::string*)*con_cls)));
+			Workbench::cur()->allow_update();
 			delete (std::string*)*con_cls;
 			*con_cls = 0;
 		}

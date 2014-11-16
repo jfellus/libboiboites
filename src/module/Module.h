@@ -34,6 +34,8 @@ public:
 	std::vector<Link*> in_links;
 	std::vector<Link*> out_links;
 
+	bool bLock = false;
+
 public:
 	Module();
 	virtual ~Module();
@@ -49,8 +51,10 @@ public:
 	virtual void remove_class(const std::string& cls) {	component->remove_class(cls);	}
 
 
-	virtual void show() {		component->show();		visible = true;	}
-	virtual void hide() {		unselect();		component->hide();		visible = false;	}
+	virtual void show() {		component->unlock(); component->show();		visible = true;	}
+	virtual void hide() {		unselect();	 component->lock();	component->hide();		visible = false;	}
+	virtual void lock() { if(bLock) return; component->lock(); bLock = true;}
+	virtual void unlock() { if(!bLock) return; component->unlock(); bLock = false;}
 
 
 	virtual void translate(double dx, double dy) {

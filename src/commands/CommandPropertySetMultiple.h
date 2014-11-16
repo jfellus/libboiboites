@@ -41,7 +41,7 @@ public:
 			old_link_values.push_back(links[i]->get_property(name));
 			links[i]->set_property(name, value);
 		}
-		if(!bFirstTime) {Document::cur()->fire_change_event();}
+		Document::cur()->fire_change_event();
 		bFirstTime = false;
 	}
 

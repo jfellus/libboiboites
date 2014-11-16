@@ -80,14 +80,10 @@ Properties* PropertiesForm::create_multiproperties(std::vector<Module*>* selecti
 
 std::string PropertiesForm::answer(const std::string& request, const std::string& data) {
 	if(request=="unselect_modules") {
-		Workbench::cur()->prevent_update();
 		Workbench::cur()->unselect_all_modules();
-		Workbench::cur()->allow_update();
 		return "ok";
 	} else if(request=="unselect_links") {
-		Workbench::cur()->prevent_update();
 		Workbench::cur()->unselect_all_links();
-		Workbench::cur()->allow_update();
 		return "ok";
 	}
 	else if(str_starts_with(request, "set/")) {

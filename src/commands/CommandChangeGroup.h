@@ -19,12 +19,15 @@ public:
 	std::vector<Group*> old_parent;
 	Group* group;
 public:
-	CommandChangeGroup(Document* doc, Group* g) : doc(doc), modules(doc->selected_modules), group(g) {}
+	CommandChangeGroup(Document* doc, Group* g) : doc(doc), modules(doc->selected_modules), group(g) {
+		for(uint i=0; i<modules.size(); i++) {
+			old_parent.push_back(modules[i]->parent);
+		}
+	}
 	virtual ~CommandChangeGroup() {}
 
 	virtual void execute() {
 		for(uint i=0; i<modules.size(); i++) {
-			old_parent[i] = modules[i]->parent;
 			if(modules[i]->parent) {
 				modules[i]->parent->remove(modules[i]);
 			}

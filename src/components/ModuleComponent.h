@@ -27,6 +27,8 @@ public:
 	int font_style = 0;
 	RGB text_color = RGB_BLACK;
 	bool bPretty = false;
+	float opacity = 1;
+	bool noglows = false;
 
 	class Glow {
 	public:
@@ -51,6 +53,8 @@ public:
 		text_color = RGB_BLACK;
 		bPretty = false;
 		font_style = 0;
+		opacity = 1;
+		noglows = false;
 	}
 
 	virtual const char* name() {return "module";}
@@ -68,7 +72,9 @@ public:
 			else if(e->property=="text-align" && e->value=="middle") flags &= !MODULECOMPONENTSTYLE_BOTTOM;
 			else if(e->property=="text-color") text_color = e->value;
 			else if(e->property=="glow") glows.push_back(Glow(e->value));
+			else if(e->property=="noglow") noglows = (e->value=="true");
 			else if(e->property=="pretty") fromString(e->value, bPretty);
+			else if(e->property=="opacity") fromString(e->value, opacity);
 		}
 	}
 };

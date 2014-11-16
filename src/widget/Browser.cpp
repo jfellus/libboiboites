@@ -37,8 +37,9 @@ public:
 	virtual std::string answer(const std::string& _url, const std::string& data) {
 		bAnswering = true;
 		std::string url = _url.substr(1);
-		std::string server_id = url.substr(0,url.find("/"));
-		std::string req = url.substr(url.find("/")+1);
+		size_t i = url.find('/');
+		std::string server_id = (i==std::string::npos) ? url : url.substr(0,i);
+		std::string req = (i==std::string::npos) ? "" : url.substr(i+1);
 		for(uint i=browsers.size()-1; i>=0; i--) {
 			if(server_id == browsers[i]->server_id) {
 				return browsers[i]->answer(req, data);

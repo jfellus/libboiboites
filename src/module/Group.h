@@ -34,6 +34,8 @@ public:
 	void close();
 	void ungroup();
 	virtual void hide();
+	virtual void lock();
+	virtual void unlock();
 
 	virtual void realize();
 

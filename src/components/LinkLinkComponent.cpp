@@ -23,7 +23,9 @@ LinkLinkComponent::LinkLinkComponent(Link* l, Component* src, Component* dst, st
 void LinkLinkComponent::render(Graphics& g) {
 	LinkComponentStyle* style = (LinkComponentStyle*)this->style;
 
-	if(!style->glows.empty()) {
+	g.set_opacity(style->opacity);
+
+	if(!style->glows.empty() && !style->noglows) {
 		Vector2D a = src->center(),b = dst->center();
 		Vector2D normal = (b-a).normalize().normal();
 		Rectangle r = bezier_absolute().get_bounds(); r.augment(1000/canvas->get_zoom());

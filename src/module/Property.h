@@ -50,21 +50,23 @@ public:
 		fromString(s, val);  set_undefined(false);
 	}
 
+	void set(const T& val) { this->val = val; }
+
 	virtual Property* copy() { return new TProperty<T>(name, val); }
 };
 
 template <class T> class TPropertyRef : public Property {
 public:
-	T& val;
+	T* val;
 public:
-	TPropertyRef(std::string name, T& val) : Property(name), val(val) { set_undefined(false); }
-	virtual std::string get_value_as_string() { return undefined ? "???" : toString(val);}
+	TPropertyRef(std::string name, T* val) : Property(name), val(val) { set_undefined(false); }
+	virtual std::string get_value_as_string() { return undefined ? "???" : toString(*val);}
 	virtual void set_value_from_string(const std::string& s) {
-		fromString(s, val);  set_undefined(false);
+		fromString(s, *val);  set_undefined(false);
 	}
-	void set(T& v) {fromString(toString(v),val);}
+	void set(T* v) {fromString(toString(*v),*val);}
 
-	virtual Property* copy() { return new TProperty<T>(name, val); }
+	virtual Property* copy() { return new TProperty<T>(name, *val); }
 };
 
 
@@ -82,11 +84,10 @@ public:
 		v.push_back(p);
 	}
 
-	template <typename T> void add(std::string name, T& f, const std::string& format = "") {add(new TProperty<T>(name, f), format);}
+	template <typename T> void add(std::string name, T f, const std::string& format = "") {add(new TProperty<T>(name, f), format);}
 	void add(std::string name, const char* s, const std::string& format = "") {add(new TProperty<std::string>(name, std::string(s)), format);}
 
-	template <typename T> void add_ref(std::string name, T& f, const std::string& format = "") {add(new TPropertyRef<T>(name, f), format);}
-	void add_ref(std::string name, const char* s, const std::string& format = "") {add(new TPropertyRef<std::string>(name, * (new std::string(s))), format);}
+	template <typename T> void add(std::string name, T* f, const std::string& format = "") {add(new TPropertyRef<T>(name, f), format);}
 
 	void set_from_string(const std::string& name, const std::string& val) {
 		Property* p = get(name);
@@ -94,12 +95,35 @@ public:
 		p->set_value_from_string(val);
 	}
 
-	template <typename T> void set(std::string name, T& f) {
+	template <typename T> void set(std::string name, T* f) {
 		Property* p = get(name);
 		if(!p) {add(new TPropertyRef<T>(name, f)); return;}
 		TPropertyRef<T>* pf = dynamic_cast<TPropertyRef<T>*>(p);
 		if(!pf) throw "Wrong argument";
 		pf->set(f);
+	}
+
+	void set(std::string name, const char* s) {
+		Property* p = get(name);
+		if(!p) {add(new TProperty<std::string>(name, std::string(s))); return;}
+		TProperty<std::string>* pf = dynamic_cast<TProperty<std::string>*>(p);
+		if(!pf) {
+			TPropertyRef<std::string>* pff = dynamic_cast<TPropertyRef<std::string>*>(p);
+			if(!pff) throw "Wrong argument";
+			std::string ss = std::string(s);
+			pff->set(&ss);
+		} else pf->set(s);
+	}
+
+	template <typename T> void set(std::string name, T f) {
+		Property* p = get(name);
+		if(!p) {add(new TProperty<T>(name, f)); return;}
+		TProperty<T>* pf = dynamic_cast<TProperty<T>*>(p);
+		if(!pf) {
+			TPropertyRef<T>* pff = dynamic_cast<TPropertyRef<T>*>(p);
+			if(!pff) throw "Wrong argument";
+			pff->set(&f);
+		} else pf->set(f);
 	}
 
 	Property* get(const std::string& name) {
@@ -108,6 +132,12 @@ public:
 			if(p->name == name) return p;
 		}
 		return NULL;
+	}
+
+	std::string get_as_string(const std::string& name) {
+		Property* p = get(name);
+		if(!p) return "";
+		else return p->get_value_as_string();
 	}
 
 	Property* operator[](const std::string& name) {return get(name);}

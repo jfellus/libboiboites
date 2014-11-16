@@ -181,11 +181,11 @@ void Workbench::run() {	win->show_all();	gtk_main();}
 
 
 void Workbench::update(bool force) {
+	if(bPreventUpdating && !force) return;
 	STATUS(get_selected_modules()->size() << " modules selected\t\t" << get_selected_links()->size() << " links selected");
 	if(canvas) {		canvas->grab_focus();		canvas->repaint(); }
 	if(properties) properties->update(get_selected_modules(), get_selected_links());
 
-	if(bPreventUpdating && !force) return;
 	if(infoform) infoform->update();
 	if(properties) properties->update();
 }
