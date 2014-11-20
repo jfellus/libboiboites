@@ -49,7 +49,7 @@ public:
 
 	virtual Rectangle get_bounds();
 
-	virtual void translate(double dx, double dy);
+	virtual void translate(double dx, double dy, bool bFireEvent = false);
 
 	virtual void show();
 
@@ -76,9 +76,7 @@ public:
 
 	virtual void on_dbl_click(ISelectable* s, GdkEventButton* e);
 
-	virtual void on_property_change(IPropertiesElement* m, const std::string& name, const std::string& val) {
-		if(name=="name") { text = val; }
-	}
+	virtual void on_property_change(IPropertiesElement* m, const std::string& name, const std::string& val);
 
 	virtual void dump(std::ostream& os) { os << "Group " << (void*)this << " (" << children.size() << ")"; }
 	virtual void create_component(const char* component_spec);

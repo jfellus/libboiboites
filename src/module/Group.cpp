@@ -121,11 +121,11 @@ void Group::close() {
 	Document::cur()->fire_change_event();
 }
 
-void Group::translate(double dx, double dy) {
+void Group::translate(double dx, double dy, bool bFireEvent) {
 	if(!translating) {
 		translating = true;
 		for(uint i=0; i<children.size(); i++) {
-			children[i]->translate(dx, dy);
+			children[i]->translate(dx, dy, bFireEvent);
 		}
 		component->set_pos(component->x + dx, component->y + dy);
 		translating = false;
@@ -197,6 +197,11 @@ void Group::on_selection_event(ISelectable* s) {
 		} else ISelectable::unselect();
 	}
 	Module::on_selection_event(s);
+}
+
+void Group::on_property_change(IPropertiesElement* m, const std::string& name, const std::string& val) {
+	if(name=="name") { text = val; }
+	Document::cur()->fire_change_event();
 }
 
 void Group::select() {

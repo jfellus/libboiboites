@@ -57,8 +57,8 @@ public:
 	virtual void unlock() { if(!bLock) return; component->unlock(); bLock = false;}
 
 
-	virtual void translate(double dx, double dy) {
-		if(component) component->set_pos(component->x + dx, component->y + dy);
+	virtual void translate(double dx, double dy, bool bFireEvent) {
+		if(component) component->set_pos(component->x + dx, component->y + dy, bFireEvent);
 	}
 
 	virtual void select();

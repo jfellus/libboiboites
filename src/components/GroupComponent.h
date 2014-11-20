@@ -28,6 +28,7 @@ public:
 	RGB text_color; bool bTextColor = false;
 	RGB selected_color; bool bSelectedColor = false;
 	float alpha = 1;
+	float opacity = 1;
 
 	int dashed = true;
 	bool bRounded = false;
@@ -42,7 +43,7 @@ public:
 		bFillColor = bFillHandleColor = bTextColor = bSelectedColor = false;
 		dashed = 1;
 		bRounded = false;
-		alpha = 1;
+		alpha = opacity = 1;
 	}
 
 	virtual const char* name() {return "group:open";}
@@ -61,6 +62,7 @@ public:
 			else if(e->property=="border-radius" && e->value=="none") {bRounded = false; }
 			else if(e->property=="dashed") {fromString(e->value, dashed);}
 			else if(e->property=="alpha") {fromString(e->value, alpha);}
+			else if(e->property=="opacity") {fromString(e->value, opacity);}
 		}
 	}
 };
@@ -90,14 +92,14 @@ public:
 		this->group = g;
 	}
 
-	virtual void translate(double dx, double dy) {
+	virtual void translate(double dx, double dy, bool bFireEvent = false) {
 		if(!visible) return;
 		if(!translating && !group->translating) {
 			translating = true;
 			group->translate(dx,dy);
 			translating = false;
 		}
-		else SVGComponent::translate(dx,dy);
+		else SVGComponent::translate(dx,dy,bFireEvent);
 	}
 
 	virtual ~GroupClosedComponent() {}
@@ -139,10 +141,10 @@ public:
 		return false;
 	}
 
-	virtual void translate(double dx, double dy) {
+	virtual void translate(double dx, double dy, bool bFireEvent = false) {
 		if(!translating) {
 			translating = true;
-			group->translate(dx,dy);
+			group->translate(dx,dy, bFireEvent);
 			translating = false;
 		}
 	}

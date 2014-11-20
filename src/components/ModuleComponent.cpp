@@ -30,9 +30,9 @@ void ModuleComponent::render(Graphics& g) {
 		cursize += style->glows[i].size;
 		g.circle(get_bounds().at_origin().augment(cursize/canvas->get_zoom()));
 		if(i==0) {
-			g.fill_alpha(style->glows[i].color, style->glows[i].alpha);
+			g.fill_alpha(style->glows[i].color, style->glows[i].alpha * style->opacity);
 		} else {
-			g.stroke_alpha(style->glows[i].color, style->glows[i].size/canvas->get_zoom(), style->glows[i].alpha);
+			g.stroke_alpha(style->glows[i].color, style->glows[i].size/canvas->get_zoom(), style->glows[i].alpha * style->opacity);
 		}
 
 		// Blur last
@@ -42,7 +42,7 @@ void ModuleComponent::render(Graphics& g) {
 			while(alpha > 0.01) {
 				alpha *= 0.8;
 				g.circle(get_bounds().at_origin().augment(cursize/canvas->get_zoom()));
-				g.stroke_alpha(style->glows[i].color, 4/canvas->get_zoom(), alpha);
+				g.stroke_alpha(style->glows[i].color, 4/canvas->get_zoom(), alpha * style->opacity);
 				cursize += 2;
 			}
 		}

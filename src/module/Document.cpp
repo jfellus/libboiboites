@@ -212,5 +212,6 @@ void Document::update_links_layers() {
 void Document::fire_change_event() {
 	for(uint i=0; i<change_listeners.size(); i++)
 		change_listeners[i]->on_document_change();
+	ZoomableDrawingArea::cur()->repaint();
 }
 

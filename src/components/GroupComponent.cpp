@@ -15,6 +15,8 @@ void GroupOpenComponent::render(Graphics& g) {
 	Rectangle rhandle = get_handle_bounds(r);
 	if(r.is_empty()) return;
 
+	g.set_opacity(style->opacity);
+
 	bool bSelected = this->bSelected;
 
 	if(bSelected) {
@@ -31,18 +33,18 @@ void GroupOpenComponent::render(Graphics& g) {
 		if(style->bRounded) g.rounded_rectangle(r);
 		else g.rectangle(r);
 		if(bSelected) {
-			g.fill_alpha(style->bSelectedColor ? style->selected_color : RGB_RED, style->alpha);
+			g.fill_alpha(style->bSelectedColor ? style->selected_color : RGB_RED, style->alpha * style->opacity);
 		} else {
-			g.fill_alpha(style->fill_color, style->alpha);
+			g.fill_alpha(style->fill_color, style->alpha * style->opacity);
 		}
 	}
 
 	if(style->bFillHandleColor) {
 		g.rectangle(rhandle);
 		if(bSelected) {
-			g.fill_alpha(style->bSelectedColor ? style->selected_color : RGB_RED, 0.8);
+			g.fill_alpha(style->bSelectedColor ? style->selected_color : RGB_RED, 0.8 * style->opacity);
 		} else {
-			g.fill_alpha(style->handle_fill_color, 0.8);
+			g.fill_alpha(style->handle_fill_color, 0.8 * style->opacity);
 		}
 	}
 

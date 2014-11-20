@@ -41,7 +41,7 @@ void LinkLinkComponent::render(Graphics& g) {
 			Vector2D n = normal*(cursize/canvas->get_zoom());
 			g.line(Line2D(src->center()-n, dst->center()-n));
 			g.line(Line2D(src->center()+n, dst->center()+n));
-			g.stroke_alpha(style->glows[i].color, (i==0? 2:1)*style->glows[i].size/canvas->get_zoom(), style->glows[i].alpha);
+			g.stroke_alpha(style->glows[i].color, (i==0? 2:1)*style->glows[i].size/canvas->get_zoom(), style->glows[i].alpha * style->opacity);
 			cursize += (i==0? 1.5:1)*style->glows[i].size;
 
 			// Blur last
@@ -53,7 +53,7 @@ void LinkLinkComponent::render(Graphics& g) {
 					Vector2D n = normal*(cursize/canvas->get_zoom());
 					g.line(Line2D(src->center()-n, dst->center()-n));
 					g.line(Line2D(src->center()+n, dst->center()+n));
-					g.stroke_alpha(style->glows[i].color, 4/canvas->get_zoom(), alpha);
+					g.stroke_alpha(style->glows[i].color, 4/canvas->get_zoom(), alpha * style->opacity);
 					cursize += 2;
 				}
 			}
