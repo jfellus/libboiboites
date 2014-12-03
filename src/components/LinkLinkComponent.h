@@ -93,11 +93,14 @@ public:
 	Link* link;
 	int dashed = 0;
 	std::string& text;
+	float _scale = 1;
 public:
 	LinkLinkComponent(Link* l, Component* src, Component* dst, std::string& text);
 	virtual ~LinkLinkComponent() {}
 public:
 	virtual void render(Graphics& g);
+
+	void scale(float s);
 };
 
 

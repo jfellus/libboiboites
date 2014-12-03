@@ -50,6 +50,7 @@ static void on_new() 	{	Workbench::cur()->new_document();	}
 static void on_open() 	{	Workbench::cur()->open();			}
 static void on_close() 	{	Workbench::cur()->close();			}
 static void on_saveas()	{	Workbench::cur()->save_as();	}
+static void on_save()	{	Workbench::cur()->save();	}
 
 static void on_undo() { CommandStack::undo(); Workbench::cur()->win->enable_menu("_Edit>_Undo",CommandStack::can_undo());}
 static void on_redo() { CommandStack::redo(); Workbench::cur()->win->enable_menu("_Edit>_Redo",CommandStack::can_redo());}
@@ -112,7 +113,8 @@ Workbench::Workbench() {
 	canvas->add_key_listener(new IKeyListener(GDK_KEY_KP_End,  GDK_SHIFT_MASK, ::on_key_tag1_off));
 	canvas->add_key_listener(new IKeyListener(GDK_KEY_KP_Down,  GDK_SHIFT_MASK, ::on_key_tag2_off));
 	canvas->add_key_listener(new IKeyListener(GDK_KEY_KP_Page_Down,  GDK_SHIFT_MASK, ::on_key_tag3_off));
-	canvas->add_key_listener(new IKeyListener(GDK_KEY_s, GDK_CONTROL_MASK, on_saveas));
+	canvas->add_key_listener(new IKeyListener(GDK_KEY_s, GDK_CONTROL_MASK, on_save));
+	canvas->add_key_listener(new IKeyListener(GDK_KEY_s, GDK_CONTROL_MASK | GDK_SHIFT_MASK, on_saveas));
 
 
 	// Menus
@@ -189,6 +191,11 @@ void Workbench::update(bool force) {
 	if(infoform) infoform->update();
 	if(properties) properties->update();
 }
+
+void Workbench::set_title(const std::string& title) {
+	win->set_title(title);
+}
+
 
 
 ////////

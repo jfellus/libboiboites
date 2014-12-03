@@ -57,6 +57,7 @@ public:
 			return (*get_selected_links())[0];
 	}
 
+	void set_title(const std::string& title);
 
 	void allow_update() {bPreventUpdating = false;}
 	void prevent_update() {bPreventUpdating = true;}

@@ -26,6 +26,7 @@ public:
 	Group* parent = NULL;
 
 	std::string text;
+	std::string text2;
 
 
 	bool visible = false;

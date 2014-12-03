@@ -10,8 +10,8 @@
 
 
 
-ModuleComponent::ModuleComponent(Module* module, const char* component_spec, std::string& text)
-: SVGComponent(component_spec), text(text), module(module) {
+ModuleComponent::ModuleComponent(Module* module, const char* component_spec, std::string& text, std::string& text2)
+: SVGComponent(component_spec), text(text), text2(text2), module(module) {
 	style = new ModuleComponentStyle();
 	style->update(css_class);
 }
@@ -22,6 +22,8 @@ ModuleComponent::ModuleComponent(Module* module, const char* component_spec, std
 //////////////////////
 
 void ModuleComponent::render(Graphics& g) {
+	g.scale(_scale);
+
 	ModuleComponentStyle* style = (ModuleComponentStyle*)this->style;
 	g.set_opacity(style->opacity);
 
@@ -50,9 +52,20 @@ void ModuleComponent::render(Graphics& g) {
 
 	SVGComponent::render(g);
 
+	if(style->bNotext) return;
+
 	g.set_color(style->text_color);
 	g.set_font(style->font_size, style->font, style->font_style);
-	Rectangle r = get_bounds().at_origin();
+	Rectangle r = get_bounds().at_origin(); r.w /= _scale; r.h /= _scale;
 	if(style->flags & MODULECOMPONENTSTYLE_BOTTOM) { r.y += r.h; r.h = g.text_extents(text).h/2; r.y += 150;}
 	g.text(text, r);
+
+	g.set_color(style->text2_color);
+	g.set_font(style->text2_font_size, style->text2_font, style->text2_font_style);
+	r = get_bounds().at_origin(); r.w /= _scale; r.h /= _scale;
+	if(style->flags & MODULECOMPONENTSTYLE_BOTTOM) { r.y += r.h; r.h = g.text_extents(text).h/2; r.y += 150;}
+	r.y+=150;
+	g.text(text2, r);
 }
+
+void ModuleComponent::scale(float ds) { _scale*=ds; canvas->repaint(); }

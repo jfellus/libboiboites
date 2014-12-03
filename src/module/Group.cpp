@@ -30,9 +30,11 @@
 
 Group::Group() {
 	text = "new_group";
+	text2 = "";
 
 	properties.set("timescale", "no"); // TODO : MOVE TO promethe-specific stuff
 	properties.set("name", &text);
+	properties.set("text2", &text2);
 
 	add_properties_listener(this);
 }

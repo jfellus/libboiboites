@@ -29,6 +29,12 @@ public:
 	bool bPretty = false;
 	float opacity = 1;
 	bool noglows = false;
+	uint text2_font_size = 100;
+	int text2_font_style = 0x001;
+	RGB text2_color = RGB(0.5,0.5,0.5);
+	std::string text2_font = "Serif";
+	bool bNotext = false;
+
 
 	class Glow {
 	public:
@@ -55,6 +61,8 @@ public:
 		font_style = 0;
 		opacity = 1;
 		noglows = false;
+		text2_color = RGB(0.5,0.5,0.5); text2_font = "Serif"; text2_font_size = 100; text2_font_style = 0x001;
+		bNotext = false;
 	}
 
 	virtual const char* name() {return "module";}
@@ -68,6 +76,11 @@ public:
 			else if(e->property=="font-weight" && e->value=="bold") font_style |= 0x010;
 			else if(e->property=="font-style" && e->value!="italic") font_style &= !(0x001);
 			else if(e->property=="font-weight" && e->value!="bold") font_style &= !(0x010);
+			else if(e->property=="text2-font-size") fromString(e->value, text2_font_size);
+			else if(e->property=="text2-font-style" && e->value=="italic") text2_font_style |= 0x001;
+			else if(e->property=="text2-font-weight" && e->value=="bold") text2_font_style |= 0x010;
+			else if(e->property=="text2-font-style" && e->value!="italic") text2_font_style &= !(0x001);
+			else if(e->property=="text2-font-weight" && e->value!="bold") text2_font_style &= !(0x010);
 			else if(e->property=="text-align" && e->value=="bottom") flags |= MODULECOMPONENTSTYLE_BOTTOM;
 			else if(e->property=="text-align" && e->value=="middle") flags &= !MODULECOMPONENTSTYLE_BOTTOM;
 			else if(e->property=="text-color") text_color = e->value;
@@ -75,6 +88,7 @@ public:
 			else if(e->property=="noglow") noglows = (e->value=="true");
 			else if(e->property=="pretty") fromString(e->value, bPretty);
 			else if(e->property=="opacity") fromString(e->value, opacity);
+			else if(e->property=="text" && e->value=="none") bNotext = true;
 		}
 	}
 };
@@ -86,13 +100,23 @@ public:
 class ModuleComponent : public SVGComponent {
 public:
 	std::string& text;
+	std::string& text2;
 	Module* module;
 
+	float _scale = 1;
+
 public:
-	ModuleComponent(Module* module, const char* component_spec, std::string& text);
+	ModuleComponent(Module* module, const char* component_spec, std::string& text, std::string& text2 = *(new std::string));
 	virtual ~ModuleComponent() {}
 
 	virtual void render(Graphics& g);
+
+	void scale(float ds);
+
+	virtual Rectangle get_bounds() {
+		if(!bounds) compute_bounds();
+		return (bounds*(double)_scale) + Vector2D(x,y);
+	}
 };
 
 

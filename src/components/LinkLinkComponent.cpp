@@ -64,7 +64,7 @@ void LinkLinkComponent::render(Graphics& g) {
 	g.set_font(style->font_size, style->font, style->font_style);
 	if(style->dashed > 0) g.dash(style->dashed);
 	render_line(g, link->bSelected ? 3 : 1);
-	double t1 = render_arrow(g, link->bSelected ? 3.5 : 1.5);
+	double t1 = render_arrow(g, _scale * (link->bSelected ? 3.5 : 1.5 ));
 
 
 	Bezier b = bezier_absolute();
@@ -76,12 +76,18 @@ void LinkLinkComponent::render(Graphics& g) {
 		g.draw_slashes(style->slashes,  b.get((t1+t2)/2), b.get((t1+t2)/2 - 0.01));
 	}
 
+	g.scale(_scale);
+
 	if(!link->text.empty()) {
 		if(t2==-1) t2 = b.intersect_location(src->get_bounds());
 		if(t2==-1) t2 = 0;
 		Vector2D p = b.get((t1+t2)/2);
 		Rectangle r(p.x, p.y+60, 0,0);
+		r.x /= _scale; r.y /= _scale;
 		g.text(link->text, r);
 	}
 }
+
+void LinkLinkComponent::scale(float s) {_scale *=s; canvas->repaint();}
+
 

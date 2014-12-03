@@ -35,7 +35,7 @@ Module::~Module() {
 }
 
 void Module::create_component(const char* component_spec) {
-	component = new ModuleComponent(this, component_spec, text);
+	component = new ModuleComponent(this, component_spec, text, text2);
 	component->set_selectable();
 	component->set_user_data("Module", this);
 	component->add_selection_listener(this);
