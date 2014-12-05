@@ -62,6 +62,11 @@ public:
 	void allow_update() {bPreventUpdating = false;}
 	void prevent_update() {bPreventUpdating = true;}
 
+	void toggle_display_all_modules_details();
+
+	bool question(const std::string& msg);
+
+
 	// Selection
 
 	void unselect_all();
@@ -81,6 +86,8 @@ public:
 	void group_selection();
 	void ungroup_selected();
 
+	void space_selection(double amount);
+
 
 	// Commands
 
@@ -97,6 +104,10 @@ public:
 	virtual void create_module() = 0;
 	virtual void create_link() = 0;
 	virtual void reconnect_link();
+
+	virtual void copy();
+	virtual void paste();
+	virtual void cut();
 
 
 	// Runtime

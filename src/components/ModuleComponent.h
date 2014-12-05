@@ -13,6 +13,11 @@
 #include <components/SVGComponent.h>
 #include "../module/Module.h"
 
+
+#define DISPLAY_INFO_ALWAYS 1
+#define DISPLAY_INFO_ON_HOVER 0
+
+
 ///////////
 // STYLE //
 ///////////
@@ -103,7 +108,12 @@ public:
 	std::string& text2;
 	Module* module;
 
+
 	float _scale = 1;
+
+public:
+	static void set_display_mode(int dm);
+	static void toggle_display_mode();
 
 public:
 	ModuleComponent(Module* module, const char* component_spec, std::string& text, std::string& text2 = *(new std::string));
@@ -117,6 +127,21 @@ public:
 		if(!bounds) compute_bounds();
 		return (bounds*(double)_scale) + Vector2D(x,y);
 	}
+
+	void set_text(const std::string& text) {
+		this->text = text;
+	}
+
+	void set_text2(const std::string& text) {
+		this->text2 = text;
+	}
+
+protected:
+	void render_glow(Graphics& g);
+	void render_text_1(Graphics& g);
+	void render_text_2(Graphics& g);
+	virtual void render_infos(Graphics& g, bool hover);
+
 };
 
 

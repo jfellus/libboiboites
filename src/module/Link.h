@@ -29,7 +29,7 @@ public:
 	Link(Module* src, Module* dst);
 	virtual ~Link();
 
-	void connect(Module* src, Module* dst);
+	virtual void connect(Module* src, Module* dst);
 
 
 	virtual void select() {
@@ -49,6 +49,7 @@ public:
 		if(s->bSelected) ISelectable::select(); else ISelectable::unselect();
 	}
 
+	virtual Link* copy();
 	virtual void attach();
 	virtual void detach(bool bSlave = false);
 

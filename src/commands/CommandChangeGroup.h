@@ -33,6 +33,8 @@ public:
 			}
 			if(group) group->add(modules[i]);
 		}
+		for(uint i=0; i<modules.size(); i++) modules[i]->on_parent_change(group);
+
 		doc->update_links_layers();
 		doc->fire_change_event();
 	}
@@ -43,6 +45,7 @@ public:
 				modules[i]->parent->remove(modules[i]);
 			}
 			if(old_parent[i]) old_parent[i]->add(modules[i]);
+			modules[i]->on_parent_change(old_parent[i]);
 		}
 
 		doc->update_links_layers();

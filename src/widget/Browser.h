@@ -26,6 +26,7 @@ public:
 	virtual ~Browser();
 
 	void open(const std::string& file);
+	void open_web(const std::string& file);
 	void script(const char* script);
 
 	virtual std::string answer(const std::string& request, const std::string& data) {return "ok"; };

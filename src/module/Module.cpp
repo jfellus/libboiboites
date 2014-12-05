@@ -35,6 +35,7 @@ Module::~Module() {
 }
 
 void Module::create_component(const char* component_spec) {
+	this->component_spec = component_spec;
 	component = new ModuleComponent(this, component_spec, text, text2);
 	component->set_selectable();
 	component->set_user_data("Module", this);
@@ -88,6 +89,16 @@ bool Module::has_selected_ancestor() {
 	if(!parent) return false;
 	if(parent->bSelected) return true;
 	return parent->has_selected_ancestor();
+}
+
+
+
+Module* Module::copy() {
+	Module* m = new Module();
+	m->text = text;
+	m->text2 = text2;
+	m->component_spec = component_spec;
+	return m;
 }
 
 

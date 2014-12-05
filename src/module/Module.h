@@ -27,6 +27,7 @@ public:
 
 	std::string text;
 	std::string text2;
+	std::string component_spec;
 
 
 	bool visible = false;
@@ -74,17 +75,24 @@ public:
 	bool has_selected_ancestor();
 
 
+	virtual Module* copy();
+
+
 	virtual void attach();
 	virtual void detach(bool bSlave = false);
 
 	virtual void set_layer(int l) { if(component) component->layer = l; }
 	float get_layer() {return component->layer;}
 
+	inline Vector2D get_pos() { if(!component) return Vector2D(); return Vector2D(component->x, component->y); }
+
 public:
 	virtual void create_component(const char* component_spec);
 	friend std::ostream& operator<<(std::ostream& os, Module* a);
 	virtual void dump(std::ostream& os) { os << "Module " << (void*)this; }
 
+
+	virtual void on_parent_change(Group* newparent) {}
 public:
 	bool bDetachedSlave = false;
 };

@@ -44,6 +44,11 @@ void Link::connect(Module* src, Module* dst) {
 	bAttached = true;
 }
 
+Link* Link::copy() {
+	Link* l = new Link(src, dst);
+	l->text = text;
+	return l;
+}
 
 void Link::attach() {
 	if(bAttached) return;

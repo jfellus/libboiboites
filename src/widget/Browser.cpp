@@ -121,6 +121,11 @@ void Browser::open(const std::string& file) {
 	if(ZoomableDrawingArea::cur()) ZoomableDrawingArea::cur()->grab_focus();
 }
 
+void Browser::open_web(const std::string& file) {
+	webkit_web_view_load_uri(webkitview,  file.c_str());
+	if(ZoomableDrawingArea::cur()) ZoomableDrawingArea::cur()->grab_focus();
+}
+
 
 void Browser::script(const char* script) {
 		if(bRuningScript) return;

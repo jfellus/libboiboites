@@ -15,6 +15,10 @@
 #include "../widget/InfoForm.h"
 #include <semaphore.h>
 #include <commands/Command.h>
+#include "../commands/CommandCut.h"
+#include "../commands/CommandCopy.h"
+#include "../commands/CommandPaste.h"
+#include "../commands/CommandSpaceSelection.h"
 
 
 static Workbench* _cur = 0;
@@ -63,13 +67,10 @@ static void on_create_module() {Workbench::cur()->create_module();}
 static void on_create_link()  {Workbench::cur()->create_link();}
 static void on_reconnect_link()  {Workbench::cur()->reconnect_link();}
 
+static void on_display_all_modules_details()  {Workbench::cur()->toggle_display_all_modules_details();}
 
-static void on_key_tag1_on()  {Workbench::cur()->add_selection_tag(1);}
-static void on_key_tag2_on()  {Workbench::cur()->add_selection_tag(2);}
-static void on_key_tag3_on()  {Workbench::cur()->add_selection_tag(3);}
-static void on_key_tag1_off()  {Workbench::cur()->remove_selection_tag(1);}
-static void on_key_tag2_off()  {Workbench::cur()->remove_selection_tag(2);}
-static void on_key_tag3_off()  {Workbench::cur()->remove_selection_tag(3);}
+static void on_space_selection(double x, double y, double dx, double dy) {Workbench::cur()->space_selection(-dy);}
+
 
 static void on_zoom_all()  {Workbench::cur()->canvas->zoom_all();}
 
@@ -107,14 +108,10 @@ Workbench::Workbench() {
 	canvas->add_key_listener(new IKeyListener(GDK_KEY_m, 0, on_create_module));
 	canvas->add_key_listener(new IKeyListener(GDK_KEY_l, 0, on_create_link));
 	canvas->add_key_listener(new IKeyListener(GDK_KEY_r, 0, on_reconnect_link));
-	canvas->add_key_listener(new IKeyListener(GDK_KEY_KP_1, GDK_CONTROL_MASK, ::on_key_tag1_on));
-	canvas->add_key_listener(new IKeyListener(GDK_KEY_KP_2, GDK_CONTROL_MASK, ::on_key_tag2_on));
-	canvas->add_key_listener(new IKeyListener(GDK_KEY_KP_3, GDK_CONTROL_MASK, ::on_key_tag3_on));
-	canvas->add_key_listener(new IKeyListener(GDK_KEY_KP_End,  GDK_SHIFT_MASK, ::on_key_tag1_off));
-	canvas->add_key_listener(new IKeyListener(GDK_KEY_KP_Down,  GDK_SHIFT_MASK, ::on_key_tag2_off));
-	canvas->add_key_listener(new IKeyListener(GDK_KEY_KP_Page_Down,  GDK_SHIFT_MASK, ::on_key_tag3_off));
 	canvas->add_key_listener(new IKeyListener(GDK_KEY_s, GDK_CONTROL_MASK, on_save));
 	canvas->add_key_listener(new IKeyListener(GDK_KEY_s, GDK_CONTROL_MASK | GDK_SHIFT_MASK, on_saveas));
+
+	canvas->add_scroll_listener(new IScrollListener(GDK_CONTROL_MASK|GDK_SHIFT_MASK, ::on_space_selection));
 
 
 	// Menus
@@ -155,12 +152,8 @@ Workbench::Workbench() {
 
 	win->add_menu("_View>Zoom All" , on_zoom_all);
 	win->add_menu("_View>__", NULL);
-	win->add_menu("_View>Add tag 1 to selection" , on_key_tag1_on);
-	win->add_menu("_View>Add tag 2 to selection" , on_key_tag2_on);
-	win->add_menu("_View>Add tag 3 to selection" , on_key_tag2_on);
-	win->add_menu("_View>Remove tag 1 to selection" , on_key_tag1_off);
-	win->add_menu("_View>Remove tag 2 to selection" , on_key_tag2_off);
-	win->add_menu("_View>Remove tag 3 to selection" , on_key_tag3_off);
+	win->add_menu("_View>Display all modules details", on_display_all_modules_details);
+
 
 	document = new Document();
 	document->add_change_listener(this);
@@ -196,6 +189,14 @@ void Workbench::set_title(const std::string& title) {
 	win->set_title(title);
 }
 
+
+void Workbench::toggle_display_all_modules_details() {
+	ModuleComponent::toggle_display_mode();
+}
+
+bool Workbench::question(const std::string& msg) {
+	return question_dialog(win->widget, msg);
+}
 
 
 ////////
@@ -280,6 +281,24 @@ void Workbench::reconnect_link() {
 		canvas->start_creator(new LinkReconnectCreator((*get_selected_links())[0]));
 	}
 }
+
+void Workbench::copy() {
+	(new CommandCopy(document))->execute();
+}
+
+void Workbench::paste() {
+	if(!CommandPaste::cur_pastable) return;
+	(new CommandPaste(document, canvas->mousePosDoc.x, canvas->mousePosDoc.y))->execute();
+}
+
+void Workbench::cut() {
+	(new CommandCut(document))->execute();
+}
+
+void Workbench::space_selection(double amount) {
+	(new CommandSpaceSelection(document, amount*0.1))->execute();
+}
+
 
 
 ////////////
