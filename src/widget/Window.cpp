@@ -6,7 +6,9 @@
  */
 
 #include "Window.h"
+#include <semaphore.h>
 
+namespace libboiboites {
 
 typedef struct _callbacks {
 	static void _on_realize(GtkWidget *widget, gpointer   user_data) { ((Window*)user_data)->on_realize();}
@@ -19,12 +21,43 @@ typedef struct _callbacks {
 } _callbacks;
 
 
+std::string _do_yes_no_box_str;
+bool _do_yes_no_box_ret;
+sem_t _do_yes_no_box_sem;
+static int _do_yes_no_box(void* p) {
+	ZoomableDrawingArea::cur()->LOCK();
+	Window* w = (Window*)p;
+	GtkDialogFlags flags = GTK_DIALOG_DESTROY_WITH_PARENT;
+	GtkWidget* dialog = gtk_message_dialog_new (GTK_WINDOW(w->widget),
+									 flags,
+									 GTK_MESSAGE_WARNING,
+									 GTK_BUTTONS_YES_NO,
+									(const gchar*)(_do_yes_no_box_str.c_str()), 0);
+	int r = gtk_dialog_run (GTK_DIALOG (dialog));
+	gtk_widget_destroy (dialog);
+	_do_yes_no_box_ret = (r==GTK_RESPONSE_YES);
+	sem_post(&_do_yes_no_box_sem);
+	ZoomableDrawingArea::cur()->UNLOCK();
+	return FALSE;
+}
+bool Window::yes_no_box(const std::string& s) {
+	canvas->LOCK();
+	_do_yes_no_box_str = s;
+	g_timeout_add(1, _do_yes_no_box, this);
+	canvas->UNLOCK();
+	sem_wait(&_do_yes_no_box_sem);
+	return _do_yes_no_box_ret;
+}
+
+
 Window::Window() : Widget(NULL){
+	sem_init(&_do_yes_no_box_sem, 0, 0);
+
 	widget = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 
 	canvas = new ZoomableDrawingArea(this);
 
-	GtkWidget* split = gtk_paned_new(GTK_ORIENTATION_HORIZONTAL);
+	split = gtk_paned_new(GTK_ORIENTATION_HORIZONTAL);
 	GtkWidget* mainbox = gtk_box_new(GTK_ORIENTATION_VERTICAL,0);
 	GtkWidget* b = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
 	menubar = gtk_menu_bar_new();
@@ -67,7 +100,7 @@ int Window::get_menu_pos(const char* menustr) {
 	GtkWidget* curmenu = menubar;
 	GtkWidget* item = NULL;
 	char str[512]; strcpy(str, menustr);
-	char *curstr = strtok(str, "/>");
+	char *curstr = strtok(str, ">");
 	for(int i=0; curstr!=0; i++) {
 		if(i!=0) {
 			curmenu = gtk_menu_item_get_submenu(GTK_MENU_ITEM(item));
@@ -86,19 +119,82 @@ int Window::get_menu_pos(const char* menustr) {
 			else index++;
 		}
 		if(item==NULL) {return -1;}
-		curstr = strtok(NULL, "/>");
+		curstr = strtok(NULL, ">");
 	}
 	if(item==NULL) return -1;
 	return index;
 }
 
+std::string Window::get_menu(const char* menustr, int offset) {
+	GtkWidget* curmenu = menubar;
+	GtkWidget* item = NULL;
+	char str[512]; strcpy(str, menustr);
+	char *curstr = strtok(str, ">");
+	for(int i=0; curstr!=0; i++) {
+		if(i!=0) {
+			curmenu = gtk_menu_item_get_submenu(GTK_MENU_ITEM(item));
+			if(!curmenu) return "";
+		}
+
+		item = NULL;
+		GList* l = gtk_container_get_children(GTK_CONTAINER(curmenu));
+		for(GList * elem = l; elem; elem = elem->next) {
+			GtkMenuItem* e = GTK_MENU_ITEM(elem->data);
+			if(item) {
+				item = GTK_WIDGET(e);
+				offset--;
+			}
+			else if(!strcmp(curstr,gtk_menu_item_get_label(e))) {
+				item = GTK_WIDGET(e);
+				curstr = strtok(NULL, ">");
+				if(curstr!=0) break;
+			}
+			if(offset<0) break;
+		}
+		if(item==NULL) {return "";}
+	}
+	if(item==NULL) return "";
+	return GTK_IS_SEPARATOR_MENU_ITEM(GTK_MENU_ITEM(item))  ? "__" : gtk_menu_item_get_label(GTK_MENU_ITEM(item));
+}
+
+void Window::remove_menu(const char* menustr, int offset) {
+	GtkWidget* curmenu = menubar;
+	GtkWidget* item = NULL;
+	char str[512]; strcpy(str, menustr);
+	char *curstr = strtok(str, ">");
+	for(int i=0; curstr!=0; i++) {
+		if(i!=0) {
+			curmenu = gtk_menu_item_get_submenu(GTK_MENU_ITEM(item));
+			if(!curmenu) return;
+		}
+
+		item = NULL;
+		GList* l = gtk_container_get_children(GTK_CONTAINER(curmenu));
+		for(GList * elem = l; elem; elem = elem->next) {
+			GtkMenuItem* e = GTK_MENU_ITEM(elem->data);
+			if(item) {
+				item = GTK_WIDGET(e);
+				offset--;
+			}
+			else if(!strcmp(curstr,gtk_menu_item_get_label(e))) {
+				item = GTK_WIDGET(e);
+				curstr = strtok(NULL, ">");
+				if(curstr!=0) break;
+			}
+			if(offset<0) break;
+		}
+		if(item==NULL) {return;}
+	}
+	if(item==NULL) return;
+	gtk_container_remove(GTK_CONTAINER(curmenu), item);
+}
 
 void Window::add_menu(const char* menustr, void (*callback)(), int pos, int accelerator_key) {
 	GtkWidget* curmenu = menubar;
 	GtkWidget* item = NULL;
 	bool bSeparator = false;
 	char str[512]; strcpy(str, menustr);
-	char *curstr = strtok(str, "/>");
+	char *curstr = strtok(str, ">");
 	for(int i=0; curstr!=0; i++) {
 		if(i!=0) {
 			curmenu = gtk_menu_item_get_submenu(GTK_MENU_ITEM(item));
@@ -121,10 +217,48 @@ void Window::add_menu(const char* menustr, void (*callback)(), int pos, int acce
 			if(pos==-1) {	gtk_menu_shell_append(GTK_MENU_SHELL(curmenu), item); }
 			else { gtk_menu_shell_insert(GTK_MENU_SHELL(curmenu), item, pos); }
 		}
-		curstr = strtok(NULL, "/>");
+		curstr = strtok(NULL, ">");
 	}
-
+	gtk_widget_show_all(curmenu);
+	gtk_widget_queue_draw(curmenu);
+	gtk_widget_show_all(item);
 	if(!bSeparator) g_signal_connect(G_OBJECT(item), "activate", G_CALLBACK(callback), NULL);
+}
+
+void Window::add_menu(const char* menustr, void (*callback)(GtkMenuItem*, void*), void* param, int pos, int accelerator_key) {
+	GtkWidget* curmenu = menubar;
+	GtkWidget* item = NULL;
+	bool bSeparator = false;
+	char str[512]; strcpy(str, menustr);
+	char *curstr = strtok(str, ">");
+	for(int i=0; curstr!=0; i++) {
+		if(i!=0) {
+			curmenu = gtk_menu_item_get_submenu(GTK_MENU_ITEM(item));
+			if(!curmenu) {curmenu = gtk_menu_new(); gtk_menu_item_set_submenu(GTK_MENU_ITEM(item), curmenu);}
+		}
+
+		item = NULL;
+		GList* l = gtk_container_get_children(GTK_CONTAINER(curmenu));
+		for(GList * elem = l; elem; elem = elem->next) {
+		  GtkMenuItem* e = GTK_MENU_ITEM(elem->data);
+		  if(!strcmp(curstr,gtk_menu_item_get_label(e))) item = GTK_WIDGET(e);
+		}
+		if(item==NULL) {
+			if(!strcmp(curstr, "__")) {
+				bSeparator = true;
+				item = gtk_separator_menu_item_new();
+			} else {
+				item = gtk_menu_item_new_with_mnemonic(curstr);
+			}
+			if(pos==-1) {	gtk_menu_shell_append(GTK_MENU_SHELL(curmenu), item); }
+			else { gtk_menu_shell_insert(GTK_MENU_SHELL(curmenu), item, pos); }
+		}
+		curstr = strtok(NULL, ">");
+	}
+	gtk_widget_show_all(curmenu);
+	gtk_widget_queue_draw(curmenu);
+	gtk_widget_show_all(item);
+	if(!bSeparator) g_signal_connect(G_OBJECT(item), "activate", G_CALLBACK(callback), param);
 }
 
 void Window::enable_menu(const char* menustr, bool bEnable) {
@@ -132,7 +266,7 @@ void Window::enable_menu(const char* menustr, bool bEnable) {
 	GtkWidget* curmenu = menubar;
 	GtkWidget* item = NULL;
 	char str[512]; strcpy(str, menustr);
-	char *curstr = strtok(str, "/>");
+	char *curstr = strtok(str, ">");
 	for(int i=0; curstr!=0; i++) {
 		if(i!=0) {
 			curmenu = gtk_menu_item_get_submenu(GTK_MENU_ITEM(item));
@@ -151,7 +285,7 @@ void Window::enable_menu(const char* menustr, bool bEnable) {
 			else index++;
 		}
 		if(item==NULL) return;
-		curstr = strtok(NULL, "/>");
+		curstr = strtok(NULL, ">");
 	}
 	if(item==NULL) return;
 	gtk_widget_set_sensitive(GTK_WIDGET(item), bEnable);
@@ -160,6 +294,10 @@ void Window::enable_menu(const char* menustr, bool bEnable) {
 
 void Window::add_tab(Widget* w, const std::string& title) {
 	gtk_notebook_append_page(GTK_NOTEBOOK(rightpane), w->widget, gtk_label_new(title.c_str()));
+}
+
+void Window::show_tab(int i) {
+	gtk_notebook_set_current_page(GTK_NOTEBOOK(rightpane), i);
 }
 
 void Window::on_size_allocate(GdkRectangle* alloc) {
@@ -175,33 +313,83 @@ gboolean Window::on_key(GdkEventKey* e) {
 	return FALSE;
 }
 
+bool Window::step_show_rightpane() {
+	int fullw = gtk_widget_get_allocated_width(rightpane);
+	int w = gtk_paned_get_position(GTK_PANED(split));
+	int maxw = gdk_window_get_width(gtk_widget_get_window(gtk_widget_get_parent(split)));
+	float v = ((maxw-fullw) - w)*0.2; if(v>-1) v = -1;
+	gtk_paned_set_position(GTK_PANED(split), (int)(w+v));
+	return (w - (maxw-fullw)) > 10;
+}
+
+bool Window::step_hide_rightpane() {
+	int w = gtk_paned_get_position(GTK_PANED(split));
+	int maxw = gdk_window_get_width(gtk_widget_get_window(gtk_widget_get_parent(split)));
+	float v = (maxw - w)*0.2; if(v<1) v = 1;
+	gtk_paned_set_position(GTK_PANED(split), (int)(w+v));
+	return maxw - w > 10;
+}
+
+int _th_show_rightpane_id = 0;
+int _th_hide_rightpane_id = 0;
+static int _th_show_rightpane(void* data) {
+	Window* w = (Window*)data;
+	if(!w->step_show_rightpane() || _th_show_rightpane_id == 0) return FALSE;
+	return TRUE;
+}
+
+static int _th_hide_rightpane(void* data) {
+	Window* w = (Window*)data;
+	if(!w->step_hide_rightpane() || _th_hide_rightpane_id == 0) return FALSE;
+	return TRUE;
+}
 
 
-void Window::message_box(const std::string& s) {
+void Window::show_rightpane() {
+	if(_th_show_rightpane_id) return;
+	if(_th_hide_rightpane_id) _th_hide_rightpane_id = 0;
+	_th_show_rightpane_id = 1;
+	_th_show_rightpane_id = g_timeout_add(50, _th_show_rightpane, this);
+}
+
+void Window::hide_rightpane() {
+	if(_th_hide_rightpane_id) return;
+	if(_th_show_rightpane_id) _th_show_rightpane_id = 0;
+	_th_hide_rightpane_id = 1;
+	_th_hide_rightpane_id = g_timeout_add(50, _th_hide_rightpane, this);
+}
+
+
+std::string _do_message_box_str;
+static int _do_message_box(void* p) {
+	ZoomableDrawingArea::cur()->LOCK();
+	Window* w = (Window*)p;
 	GtkDialogFlags flags = GTK_DIALOG_DESTROY_WITH_PARENT;
-	GtkWidget* dialog = gtk_message_dialog_new (GTK_WINDOW(widget),
+	GtkWidget* dialog = gtk_message_dialog_new (GTK_WINDOW(w->widget),
 									 flags,
 									 GTK_MESSAGE_ERROR,
 									 GTK_BUTTONS_OK,
-									(const gchar*)(s.c_str()), 0);
+									(const gchar*)(_do_message_box_str.c_str()), 0);
 	gtk_dialog_run (GTK_DIALOG (dialog));
 	gtk_widget_destroy (dialog);
+	ZoomableDrawingArea::cur()->UNLOCK();
+	return FALSE;
 }
 
-bool Window::yes_no_box(const std::string& s) {
-	GtkDialogFlags flags = GTK_DIALOG_DESTROY_WITH_PARENT;
-	GtkWidget* dialog = gtk_message_dialog_new (GTK_WINDOW(widget),
-									 flags,
-									 GTK_MESSAGE_WARNING,
-									 GTK_BUTTONS_YES_NO,
-									(const gchar*)(s.c_str()), 0);
-	int r = gtk_dialog_run (GTK_DIALOG (dialog));
-	gtk_widget_destroy (dialog);
-	return r==GTK_RESPONSE_YES;
+void Window::message_box(const std::string& s) {
+	canvas->LOCK();
+	_do_message_box_str = s;
+	g_timeout_add(1, _do_message_box, this);
+	canvas->UNLOCK();
 }
+
 
 void Window::set_status(const std::string& text) {
+	canvas->LOCK();
 	gtk_statusbar_remove_all(GTK_STATUSBAR(status), 0);
 	gtk_statusbar_push(GTK_STATUSBAR(status), 0, text.c_str());
+	canvas->UNLOCK();
 }
 
+
+}

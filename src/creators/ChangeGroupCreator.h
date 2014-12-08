@@ -11,6 +11,8 @@
 #include <creator/Creator.h>
 #include "../module/Group.h"
 
+namespace libboiboites {
+
 class ChangeGroupCreator : public Creator {
 public:
 	Group* group = NULL;
@@ -24,5 +26,7 @@ public:
 	virtual void on_mouse_move(GdkEventMotion* e);
 
 };
+
+}
 
 #endif /* CHANGEGROUPCREATOR_H_ */

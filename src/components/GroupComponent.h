@@ -13,6 +13,9 @@
 #include "../module/Group.h"
 #include "ModuleComponent.h"
 
+
+namespace libboiboites {
+
 ///////////
 // STYLE //
 ///////////
@@ -87,9 +90,11 @@ public:
 
 public:
 	GroupClosedComponent(Group* g, const char* component_spec) : ModuleComponent(g, component_spec, g->text) {
+		ready = false;
 		style = new Style();
 		style->update(css_class);
 		this->group = g;
+		ready = true;
 	}
 
 	virtual void translate(double dx, double dy, bool bFireEvent = false) {
@@ -114,11 +119,13 @@ public:
 	bool translating = false;
 public:
 	GroupOpenComponent(Group* g) : Component(-1000) {
+		ready = false;
 		hide();
 		set_selectable();
 		this->group = g;
 		style = new GroupOpenComponentStyle();
 		style->update(css_class);
+		ready = true;
 	}
 
 	virtual ~GroupOpenComponent() {}
@@ -176,5 +183,8 @@ public:
 
 };
 
+
+
+}
 
 #endif /* GROUPCOMPONENT_H_ */

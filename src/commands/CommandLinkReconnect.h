@@ -11,6 +11,9 @@
 #include <commands/Command.h>
 #include "../module/Document.h"
 
+
+namespace libboiboites {
+
 class CommandLinkReconnect : public Command {
 public:
 	Link* link;
@@ -38,5 +41,7 @@ public:
 
 	virtual std::string get_text() {return "Reconnect link";}
 };
+
+}
 
 #endif /* COMMANDLINKRECONNECT_H_ */

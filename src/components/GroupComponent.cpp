@@ -8,6 +8,9 @@
 #include "GroupComponent.h"
 #include <ZoomableDrawingArea.h>
 
+namespace libboiboites {
+
+
 
 void GroupOpenComponent::render(Graphics& g) {
 	GroupOpenComponentStyle* style = (GroupOpenComponentStyle*)this->style;
@@ -58,5 +61,9 @@ void GroupOpenComponent::render(Graphics& g) {
 		}
 		g.text(group->text, rhandle);
 	}
+
+}
+
+
 
 }

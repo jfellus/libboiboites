@@ -9,6 +9,8 @@
 #include <ZoomableDrawingArea.h>
 
 
+namespace libboiboites {
+
 static int display_mode = DISPLAY_INFO_ON_HOVER;
 void ModuleComponent::set_display_mode(int dm) {
 	display_mode = dm;
@@ -24,8 +26,10 @@ void ModuleComponent::toggle_display_mode() {
 
 ModuleComponent::ModuleComponent(Module* module, const char* component_spec, std::string& text, std::string& text2)
 : SVGComponent(component_spec), text(text), text2(text2), module(module) {
+	ready = false;
 	style = new ModuleComponentStyle();
 	style->update(css_class);
+	ready = true;
 }
 
 
@@ -106,3 +110,4 @@ void ModuleComponent::render_infos(Graphics& g, bool hover) {
 void ModuleComponent::scale(float ds) { _scale*=ds; canvas->repaint(); }
 
 
+}

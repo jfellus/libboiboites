@@ -14,6 +14,8 @@
 #include <queue>
 #include <list>
 
+namespace libboiboites {
+
 class LayoutFlowModule {
 public:
 	Module* module;
@@ -48,5 +50,7 @@ public:
 
 	virtual void layout();
 };
+
+}
 
 #endif /* LAYOUTFLOW_H_ */

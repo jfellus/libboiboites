@@ -11,7 +11,7 @@
 #include "../components/LinkLinkComponent.h"
 
 
-
+namespace libboiboites {
 
 Link::Link(Module* src, Module* dst) {
 	connect(src, dst);
@@ -68,3 +68,4 @@ void Link::detach(bool bSlave) {
 }
 
 
+}

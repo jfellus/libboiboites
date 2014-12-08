@@ -13,6 +13,9 @@
 #include <map>
 
 
+
+namespace libboiboites {
+
 class CommandUngroup : public Command {
 public:
 	Document* doc;
@@ -63,5 +66,9 @@ public:
 		return "Ungroup";
 	}
 };
+
+
+
+}
 
 #endif /* COMMANDUNGROUP_H_ */

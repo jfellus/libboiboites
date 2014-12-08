@@ -10,6 +10,8 @@
 #include <gtk/gtk.h>
 #include "../workbench/Workbench.h"
 
+namespace libboiboites {
+
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 
 static InfoForm* _cur = 0;
@@ -66,4 +68,6 @@ void InfoForm::update() {
 	GtkTextIter i; gtk_text_buffer_get_end_iter(buffer, &i);
 	gtk_text_view_scroll_to_iter(GTK_TEXT_VIEW(txt), &i, 0, 0, 0, 0);
 	repaint();
+}
+
 }

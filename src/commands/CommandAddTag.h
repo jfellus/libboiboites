@@ -11,6 +11,7 @@
 #include <commands/Command.h>
 #include "../module/Document.h"
 
+namespace libboiboites {
 
 class CommandAddTag : public Command {
 public:
@@ -53,5 +54,7 @@ public:
 		return TOSTRING("Add tag " << cls);
 	}
 };
+
+}
 
 #endif /* COMMANDADDTAG_H_ */

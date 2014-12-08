@@ -14,6 +14,8 @@
 #include "../module/Module.h"
 
 
+namespace libboiboites {
+
 #define DISPLAY_INFO_ALWAYS 1
 #define DISPLAY_INFO_ON_HOVER 0
 
@@ -145,4 +147,8 @@ protected:
 };
 
 
+
+}
+
 #endif /* MODULECOMPONENT_H_ */
+

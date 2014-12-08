@@ -14,6 +14,7 @@
 #include "../widget/PropertiesForm.h"
 #include "../widget/InfoForm.h"
 
+namespace libboiboites {
 
 // Utils
 
@@ -23,7 +24,7 @@ void workbench_set_status(const std::string& text);
 
 
 class Workbench : public Document::IPropertiesListener, Document::IDocumentChangeListener,
-							ZoomableDrawingArea::ISelectionListener, ZoomableDrawingArea::IChangeListener {
+							ZoomableDrawingArea::ISelectionListener, ZoomableDrawingArea::IChangeListener, ZoomableDrawingArea::IDblClickListener {
 
 public:
 	Document* document = 0;
@@ -34,6 +35,8 @@ public:
 		InfoForm* infoform = 0;
 
 	bool bPreventUpdating = false;
+
+	std::string cur_filename = "";
 
 public:
 	static Workbench* cur();
@@ -87,18 +90,22 @@ public:
 	void ungroup_selected();
 
 	void space_selection(double amount);
-
+	void align_selection();
 
 	// Commands
 
-	virtual void new_document() = 0;
-	virtual void close() = 0;
+	virtual void new_document();
+	virtual void close();
 	virtual void save() { save_as(); }
 	virtual void open();
 	virtual void save_as();
+	void open(const std::string& filename);
+	void save(const std::string& filename);
 
-	virtual void open(const std::string& filename) = 0;
-	virtual void save(const std::string& filename) = 0;
+	virtual void do_new_document() = 0;
+	virtual void do_close() = 0;
+	virtual void do_open(const std::string& filename) = 0;
+	virtual void do_save(const std::string& filename) = 0;
 
 
 	virtual void create_module() = 0;
@@ -122,6 +129,7 @@ public:
 	virtual void on_selection_change();
 	virtual void on_document_change();
 	virtual void on_canvas_change();
+	virtual void on_dbl_click(Component* c);
 
 	// Debug
 
@@ -131,4 +139,8 @@ public:
 
 inline std::ostream& operator<<(std::ostream& os, Workbench* a) {a->dump(os);return os;}
 
+}
+
 #endif /* COEOS_WORKBENCH_H_ */
+
+

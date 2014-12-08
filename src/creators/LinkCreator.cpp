@@ -11,6 +11,8 @@
 #include "../module/Document.h"
 
 
+namespace libboiboites {
+
 LinkCreator::LinkCreator() {
 }
 
@@ -44,3 +46,4 @@ void LinkCreator::render(Graphics& g) {
 
 
 
+}

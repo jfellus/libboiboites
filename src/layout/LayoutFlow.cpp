@@ -7,6 +7,7 @@
 
 #include "LayoutFlow.h"
 
+namespace libboiboites {
 
 void LayoutFlow::add(Module* m) {
 	modules.push_back(new LayoutFlowModule(m));
@@ -107,4 +108,6 @@ void LayoutFlow::layout() {
 		depth++;
 		p.x += xspace;
 	}
+}
+
 }

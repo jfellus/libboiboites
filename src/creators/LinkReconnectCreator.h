@@ -11,6 +11,8 @@
 #include <creator/Creator.h>
 #include "../module/Link.h"
 
+namespace libboiboites {
+
 class LinkReconnectCreator : public Creator {
 public:
 	Link* link = 0;
@@ -28,5 +30,8 @@ public:
 
 	virtual void render(Graphics& g);
 };
+
+
+}
 
 #endif /* LINKRECONNECTCREATOR_H_ */

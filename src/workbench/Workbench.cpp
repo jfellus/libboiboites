@@ -19,7 +19,11 @@
 #include "../commands/CommandCopy.h"
 #include "../commands/CommandPaste.h"
 #include "../commands/CommandSpaceSelection.h"
+#include "../commands/CommandAlignSelection.h"
+#include "Job.h"
+#include <X11/Xlib.h>
 
+namespace libboiboites {
 
 static Workbench* _cur = 0;
 Workbench* Workbench::cur() { return _cur;}
@@ -50,19 +54,23 @@ void workbench_set_status(const std::string& text) {
 // CALLBACKS //
 ///////////////
 
-static void on_new() 	{	Workbench::cur()->new_document();	}
-static void on_open() 	{	Workbench::cur()->open();			}
-static void on_close() 	{	Workbench::cur()->close();			}
-static void on_saveas()	{	Workbench::cur()->save_as();	}
-static void on_save()	{	Workbench::cur()->save();	}
+static void on_new() 	{	Workbench::cur()->new_document();								}
+static void on_open() 	{	Workbench::cur()->open();										}
+static void on_close() 	{	Workbench::cur()->close();										}
+static void on_saveas()	{	Workbench::cur()->save_as();									}
+static void on_save()	{	Workbench::cur()->save();										}
 
-static void on_undo() { CommandStack::undo(); Workbench::cur()->win->enable_menu("_Edit>_Undo",CommandStack::can_undo());}
-static void on_redo() { CommandStack::redo(); Workbench::cur()->win->enable_menu("_Edit>_Redo",CommandStack::can_redo());}
+static void on_undo() {
+	JOB_SUBMIT("Undo", {CommandStack::undo(); Workbench::cur()->win->enable_menu("_Edit>_Undo",CommandStack::can_undo());});
+}
+static void on_redo() {
+	JOB_SUBMIT("Redo", {CommandStack::redo(); Workbench::cur()->win->enable_menu("_Edit>_Redo",CommandStack::can_redo());});
+}
 
-static void on_group() {Workbench::cur()->group_selection();}
-static void on_ungroup() {Workbench::cur()->ungroup_selected();}
-static void on_change_group() {Workbench::cur()->change_group_selected();}
-static void on_delete() {Workbench::cur()->delete_selection();}
+static void on_group() {	JOB_SUBMIT("Group",  Workbench::cur()->group_selection()); }
+static void on_ungroup() {	JOB_SUBMIT("Ungroup", Workbench::cur()->ungroup_selected()); }
+static void on_change_group() { JOB_SUBMIT("Change Group", Workbench::cur()->change_group_selected()); }
+static void on_delete() {	JOB_SUBMIT("Delete", Workbench::cur()->delete_selection()); }
 static void on_create_module() {Workbench::cur()->create_module();}
 static void on_create_link()  {Workbench::cur()->create_link();}
 static void on_reconnect_link()  {Workbench::cur()->reconnect_link();}
@@ -70,6 +78,7 @@ static void on_reconnect_link()  {Workbench::cur()->reconnect_link();}
 static void on_display_all_modules_details()  {Workbench::cur()->toggle_display_all_modules_details();}
 
 static void on_space_selection(double x, double y, double dx, double dy) {Workbench::cur()->space_selection(-dy);}
+static void on_align_selection() {Workbench::cur()->align_selection();}
 
 
 static void on_zoom_all()  {Workbench::cur()->canvas->zoom_all();}
@@ -90,6 +99,7 @@ static void _on_update() {
 
 Workbench::Workbench() {
 	_cur = this;
+	Job::init();
 
 	win = new Window();
 	ERROR_STREAM = new MessageErrorStream();
@@ -110,16 +120,16 @@ Workbench::Workbench() {
 	canvas->add_key_listener(new IKeyListener(GDK_KEY_r, 0, on_reconnect_link));
 	canvas->add_key_listener(new IKeyListener(GDK_KEY_s, GDK_CONTROL_MASK, on_save));
 	canvas->add_key_listener(new IKeyListener(GDK_KEY_s, GDK_CONTROL_MASK | GDK_SHIFT_MASK, on_saveas));
+	canvas->add_key_listener(new IKeyListener(GDK_KEY_a, 0, on_align_selection));
 
-	canvas->add_scroll_listener(new IScrollListener(GDK_CONTROL_MASK|GDK_SHIFT_MASK, ::on_space_selection));
-
+	canvas->add_scroll_listener(new IScrollListener(GDK_CONTROL_MASK|GDK_SHIFT_MASK, libboiboites::on_space_selection));
 
 	// Menus
 
 	win->add_menu("_File>_New", on_new);
 	win->add_menu("_File>_Open", on_open);
 	win->add_menu("_File>_Close", on_close);
-	win->add_menu("_File>_Save", on_saveas);
+	win->add_menu("_File>_Save", on_save);
 	win->add_menu("_File>_Save as", on_saveas);
 	win->add_menu("_File>__", NULL);
 	win->add_menu("_File>_Quit", gtk_main_quit);
@@ -158,8 +168,11 @@ Workbench::Workbench() {
 	document = new Document();
 	document->add_change_listener(this);
 	document->add_properties_listener(this);
+
 	canvas->add_selection_listener(this);
 	canvas->add_change_listener(this);
+	canvas->add_dbl_click_listener(this);
+
 
 	g_signal_new("update_workbench", G_TYPE_OBJECT, G_SIGNAL_RUN_FIRST, 0, NULL, NULL, NULL, G_TYPE_NONE, 0);
 	g_signal_connect(G_OBJECT(win->widget), "update_workbench", G_CALLBACK(_on_update), this);
@@ -172,7 +185,9 @@ Workbench::~Workbench() {	delete win; }
 // METHODS //
 /////////////
 
-void Workbench::run() {	win->show_all();	gtk_main();}
+void Workbench::run() {	win->show_all();
+	gtk_main();
+}
 
 
 void Workbench::update(bool force) {
@@ -203,6 +218,14 @@ bool Workbench::question(const std::string& msg) {
 // IO //
 ////////
 
+void Workbench::new_document() {
+	JOB_SUBMIT("New document", Workbench::cur()->do_new_document());
+}
+
+void Workbench::close() {
+	JOB_SUBMIT("Close", Workbench::cur()->do_close());
+}
+
 
 void Workbench::open() {
 	std::string filename = open_file_dialog(win->widget);
@@ -221,6 +244,15 @@ void Workbench::save_as() {
 	}
 }
 
+void Workbench::open(const std::string& filename) {
+	cur_filename = filename;
+	JOB_SUBMIT(TOSTRING("Open " << filename),Workbench::cur()->do_open(Workbench::cur()->cur_filename));
+}
+
+void Workbench::save(const std::string& filename) {
+	cur_filename = filename;
+	JOB_SUBMIT(TOSTRING("Save " << filename),Workbench::cur()->do_save(Workbench::cur()->cur_filename));
+}
 
 
 ///////////////
@@ -296,8 +328,15 @@ void Workbench::cut() {
 }
 
 void Workbench::space_selection(double amount) {
+	if(get_selected_modules_count() < 2) return;
 	(new CommandSpaceSelection(document, amount*0.1))->execute();
 }
+
+void Workbench::align_selection() {
+	if(get_selected_modules_count() < 2) return;
+	(new CommandAlignSelection(document))->execute();
+}
+
 
 
 
@@ -322,4 +361,13 @@ void Workbench::on_property_change(IPropertiesElement* m, const std::string& nam
 	canvas->repaint();
 }
 
+void Workbench::on_dbl_click(Component* c) {
+	if(c) {
+		win->show_rightpane();
+		win->show_tab(0);
+	}
+	else win->hide_rightpane();
+}
 
+
+}

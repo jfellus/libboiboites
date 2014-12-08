@@ -11,6 +11,9 @@
 #include <commands/Command.h>
 #include "../module/Document.h"
 
+
+namespace libboiboites {
+
 class CommandPropertySetMultiple : public Command {
 public:
 	std::vector<Module*> modules;
@@ -59,5 +62,8 @@ public:
 		return TOSTRING("Set " << name);
 	}
 };
+
+
+}
 
 #endif /* COMMANDPROPERTYSETMULTIPLE_H_ */

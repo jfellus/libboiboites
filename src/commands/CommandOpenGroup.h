@@ -11,6 +11,10 @@
 #include <commands/Command.h>
 #include "../module/Document.h"
 
+
+namespace libboiboites {
+
+
 class CommandOpenGroup : public Command {
 public:
 	Document* doc;
@@ -31,5 +35,8 @@ public:
 		return "Open group";
 	}
 };
+
+
+}
 
 #endif /* COMMANDOPENGROUP_H_ */

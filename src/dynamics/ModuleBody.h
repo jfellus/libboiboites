@@ -12,6 +12,8 @@
 #include "../module/Module.h"
 #include "DynEngine.h"
 
+namespace libboiboites {
+
 class ModuleBody : public Body {
 public:
 	double f_attraction = 0.00001;
@@ -64,5 +66,8 @@ public:
 		return acc;
 	}
 };
+
+}
+
 
 #endif /* MODULEBODY_H_ */

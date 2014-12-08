@@ -14,6 +14,9 @@
 #include "../module/Link.h"
 #include <util/utils.h>
 
+
+namespace libboiboites {
+
 class PropertiesForm : public Browser {
 public:
 	Properties* properties = 0;
@@ -29,11 +32,11 @@ public:
 	virtual ~PropertiesForm() {	}
 
 	void update(std::vector<Module*>* selected_modules, std::vector<Link*>* selected_links);
+	virtual void update() { Browser::update(); }
 
 	virtual std::string answer(const std::string& request, const std::string& data);
 
-	virtual void update() {Browser::update();}
-	virtual void do_update();
+	void reset();
 
 protected:
 	virtual Properties* create_multiproperties(std::vector<Link*>* selection);
@@ -41,4 +44,7 @@ protected:
 
 };
 
+}
+
 #endif /* PROPERTIESFORM_H_ */
+

@@ -7,4 +7,9 @@
 
 #include "CommandPaste.h"
 
+
+namespace libboiboites {
+
 Pastable* CommandPaste::cur_pastable;
+
+}

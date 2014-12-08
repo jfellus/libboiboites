@@ -7,8 +7,15 @@
 
 #include "DynEngine.h"
 
+
+namespace libboiboites {
+
+
 void* DynEngine::_start(void* p) { ((DynEngine*)p)->run(); return 0;}
 
 void DynEngine::start() {
 	pthread_create(&thread, NULL, _start, this);
+}
+
+
 }

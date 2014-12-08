@@ -12,6 +12,9 @@
 #include "../module/Document.h"
 
 
+
+namespace libboiboites {
+
 class CommandSpaceSelection : public Command {
 public:
 	Document* doc;
@@ -30,7 +33,7 @@ public:
 	virtual void execute() {
 		for(uint i=0; i<modules.size(); i++) {
 			Vector2D dir = (modules[i]->component->center() - center) * amount;
-			modules[i]->translate(dir.x, dir.y,false);
+			modules[i]->translate(dir.x, dir.y,true);
 		}
 		doc->fire_change_event();
 	}
@@ -38,7 +41,7 @@ public:
 	virtual void undo() {
 		for(uint i=0; i<modules.size(); i++) {
 			Vector2D dir = (1-1/(1+amount))*(center - modules[i]->component->center());
-			modules[i]->translate(dir.x, dir.y,false);
+			modules[i]->translate(dir.x, dir.y,true);
 		}
 		doc->fire_change_event();
 	}
@@ -47,5 +50,9 @@ public:
 		return TOSTRING("Space selection");
 	}
 };
+
+
+
+}
 
 #endif /* CommandSpaceSelection_H_ */

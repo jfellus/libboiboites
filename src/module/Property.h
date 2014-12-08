@@ -11,6 +11,9 @@
 #include <util/utils.h>
 
 
+
+namespace libboiboites {
+
 class Property {
 public:
 	std::string format = "";
@@ -21,7 +24,7 @@ public:
 	Property(std::string name) { this->name = name; }
 	virtual ~Property() {}
 
-	virtual std::string get_value_as_string() { return undefined ? "???" : "-";}
+	virtual std::string get_value_as_string() { return undefined ? "???" : "";}
 	virtual void set_value_from_string(const std::string& s)  = 0;
 
 	void set_undefined(bool undefined = true) {this->undefined = undefined;}
@@ -194,7 +197,7 @@ public:
 
 	void add_properties_listener(IPropertiesListener* l) { propertiesListeners.push_back(l);}
 	void set_property(const std::string& name, const std::string& value);
-	std::string get_property(const std::string& name) {return properties.get(name)->get_value_as_string();}
+	std::string get_property(const std::string& name) {return properties.get(name) ? properties.get(name)->get_value_as_string() : "";}
 };
 
 
@@ -210,5 +213,7 @@ public:
 	virtual void on_property_change(IPropertiesElement* m, const std::string& name, const std::string& val) = 0;
 };
 
+
+}
 
 #endif /* PROPERTY_H_ */

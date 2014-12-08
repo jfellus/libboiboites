@@ -13,6 +13,8 @@
 #include <ZoomableDrawingArea.h>
 
 
+namespace libboiboites {
+
 class Pastable {
 public:
 	Pastable() {}
@@ -133,5 +135,7 @@ public:
 		return "Paste";
 	}
 };
+
+}
 
 #endif /* CommandPaste_H_ */

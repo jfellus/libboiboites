@@ -11,6 +11,8 @@
 #include <commands/Command.h>
 #include "../module/Document.h"
 
+namespace libboiboites {
+
 class CommandCloseGroup : public Command {
 public:
 	Document* doc;
@@ -34,5 +36,7 @@ public:
 		return "Close group";
 	}
 };
+
+}
 
 #endif /* CommandCloseGroup_H_ */

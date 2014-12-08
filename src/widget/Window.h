@@ -15,7 +15,7 @@
 
 #define GLADE_CALLBACK extern "C" G_MODULE_EXPORT
 
-
+namespace libboiboites {
 
 class Window : public Widget {
 public:
@@ -25,6 +25,7 @@ public:
 	GtkWidget* rightpane = 0;
 	GtkWidget* menubar = 0;
 	GtkWidget* toolbar = 0;
+	GtkWidget* split = 0;
 
 private:
 	bool bFirstDraw = true;
@@ -41,15 +42,25 @@ public:
 	void show_all() {gtk_widget_show_all(widget);}
 
 	void add_menu(const char* menustr, void (*callback)(), int pos = -1, int accelerator_key = 0);
+	void add_menu(const char* menustr, void (*callback)(GtkMenuItem*,void*), void* param, int pos = -1, int accelerator_key = 0);
+
+	std::string get_menu(const char* menustr, int offset);
+	void remove_menu(const char* menustr, int offset);
 	int get_menu_pos(const char* menustr);
 	void enable_menu(const char* menustr, bool bEnable = true);
 
 	void add_tab(Widget* w, const std::string& title);
+	void show_tab(int i);
 
 	void set_status(const std::string& text);
 
 	void message_box(const std::string& s);
 	bool yes_no_box(const std::string& message);
+
+	void show_rightpane();
+	void hide_rightpane();
+	bool step_show_rightpane();
+	bool step_hide_rightpane();
 
 protected:
 	friend struct _callbacks;
@@ -61,6 +72,7 @@ protected:
 	virtual gboolean on_key(GdkEventKey* e) ;
 };
 
+}
 
 
 #endif /* WINDOW_H_ */

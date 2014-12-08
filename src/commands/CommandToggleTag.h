@@ -11,6 +11,9 @@
 #include <commands/Command.h>
 #include "../module/Document.h"
 
+
+namespace libboiboites {
+
 class CommandToggleTag : public Command {
 public:
 	Document* doc;
@@ -36,5 +39,8 @@ public:
 
 	virtual std::string get_text() {return TOSTRING("Toggle tag " << cls);}
 };
+
+
+}
 
 #endif /* COMMANDTOGGLETAG_H_ */

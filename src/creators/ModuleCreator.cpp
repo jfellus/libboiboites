@@ -9,6 +9,8 @@
 #include <ZoomableDrawingArea.h>
 #include "../module/Document.h"
 
+namespace libboiboites {
+
 ModuleCreator::ModuleCreator() {
 	module = 0;
 }
@@ -47,4 +49,6 @@ void ModuleCreator::on_mouse_move(GdkEventMotion* e) {
 		if(g->component_open) g->component_open->add_class("highlighted");
 	}
 	group = g;
+}
+
 }

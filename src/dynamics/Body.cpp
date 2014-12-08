@@ -8,6 +8,8 @@
 #include "Body.h"
 #include "DynEngine.h"
 
+namespace libboiboites {
+
 void Body::iteration() {
 	compute_acc();
 	speed += acc;
@@ -15,4 +17,7 @@ void Body::iteration() {
 	pos += speed;
 	if(engine->shakeQty!=0) pos += Vector2D::rand(engine->shakeQty);
 	update_pos();
+}
+
+
 }

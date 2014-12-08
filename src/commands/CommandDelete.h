@@ -12,6 +12,8 @@
 #include "../module/Document.h"
 
 
+namespace libboiboites {
+
 class CommandDelete : public Command {
 public:
 	Document* doc;
@@ -57,5 +59,8 @@ public:
 		return "Delete";
 	}
 };
+
+
+}
 
 #endif /* COMMANDDELETE_H_ */

@@ -11,6 +11,8 @@
 #include <commands/Command.h>
 #include "../module/Document.h"
 
+namespace libboiboites {
+
 class CommandGroup : public Command {
 public:
 	Group* g = NULL;
@@ -44,5 +46,7 @@ public:
 		return "Group";
 	}
 };
+
+}
 
 #endif /* COMMANDGROUP_H_ */

@@ -12,6 +12,9 @@
 #include "../module/Document.h"
 #include "CommandPaste.h"
 
+namespace libboiboites {
+
+
 class CommandCut : public Command {
 public:
 	Document* doc;
@@ -48,5 +51,7 @@ public:
 		return "Cut";
 	}
 };
+
+}
 
 #endif /* CommandCut_H_ */

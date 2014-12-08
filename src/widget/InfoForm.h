@@ -11,6 +11,8 @@
 #include <widget/Widget.h>
 #include <util/utils.h>
 
+namespace libboiboites {
+
 
 class InfoForm : public Widget {
 public:
@@ -43,5 +45,6 @@ public:
 };
 
 
+}
 
 #endif /* INFOFORM_H_ */

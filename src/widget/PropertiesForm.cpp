@@ -9,6 +9,8 @@
 #include "../workbench/Workbench.h"
 #include "../commands/CommandPropertySetMultiple.h"
 
+namespace libboiboites {
+
 void PropertiesForm::update(std::vector<Module*>* selected_modules, std::vector<Link*>* selected_links) {
 	this->selected_modules = selected_modules;
 	this->selected_links = selected_links;
@@ -99,9 +101,11 @@ std::string PropertiesForm::answer(const std::string& request, const std::string
 	}
 }
 
+void PropertiesForm::reset() {
+	multiproperties = 0;
+	properties = 0;
+	selected_modules = 0;
+	selected_links = 0;
+}
 
-void PropertiesForm::do_update() {
-	if(is_loaded())	{
-		script("update();");
-	}
 }

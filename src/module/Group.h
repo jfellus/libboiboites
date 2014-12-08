@@ -11,6 +11,9 @@
 #include <util/utils.h>
 #include "Module.h"
 
+
+namespace libboiboites {
+
 class GroupOpenComponent;
 
 class Group : public Module, public IPropertiesListener {
@@ -83,4 +86,8 @@ public:
 };
 
 
+
+}
+
 #endif /* GROUP_H_ */
+

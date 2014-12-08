@@ -8,6 +8,9 @@
 #include "Property.h"
 
 
+namespace libboiboites {
+
+
 std::ostream& operator<<(std::ostream& os, Properties* a) {
 	if(!a) {return os << "";}
 	a->dump(os);
@@ -27,4 +30,7 @@ void IPropertiesElement::set_property(const std::string& name, const std::string
 	for(uint i=0; i<propertiesListeners.size(); i++) {
 		propertiesListeners[i]->on_property_change(this, name, value);
 	}
+}
+
+
 }

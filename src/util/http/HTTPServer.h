@@ -12,6 +12,10 @@
 
 struct MHD_Daemon;
 
+namespace libboiboites {
+
+
+
 #define DEFAULT_PORT 21235
 
 class HTTPServer {
@@ -25,7 +29,7 @@ public:
 	virtual std::string answer(const std::string& url, const std::string& data) = 0;
 };
 
-
+}
 
 
 #endif /* HTTPSERVER_H_ */

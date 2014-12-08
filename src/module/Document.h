@@ -17,6 +17,8 @@
 
 
 
+namespace libboiboites {
+
 
 class Document : public IPropertiesListener, ISelectionListener {
 public:
@@ -116,5 +118,7 @@ protected:
 
 inline std::ostream& operator<<(std::ostream& os, Document* a) {	a->dump(os);return os;}
 
+
+}
 
 #endif /* DOCUMENT_H_ */

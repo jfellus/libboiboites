@@ -12,6 +12,9 @@
 #include "../module/Document.h"
 
 
+
+namespace libboiboites {
+
 class CommandRemoveTag : public Command {
 public:
 	Document* doc;
@@ -53,5 +56,9 @@ public:
 		return TOSTRING("Remove tag " << cls);
 	}
 };
+
+
+}
+
 
 #endif /* CommandRemoveTag_H_ */

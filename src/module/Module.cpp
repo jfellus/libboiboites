@@ -11,7 +11,7 @@
 #include <ZoomableDrawingArea.h>
 
 
-
+namespace libboiboites {
 
 ///////////////////////////
 // MODULE IMPLEMENTATION //
@@ -131,3 +131,4 @@ void Module::detach(bool bSlave) {
 	visible = false;
 }
 
+}

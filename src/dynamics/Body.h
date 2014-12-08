@@ -11,6 +11,8 @@
 #include <util/utils.h>
 #include <util/geom.h>
 
+namespace libboiboites {
+
 class DynEngine;
 
 class Body {
@@ -36,5 +38,8 @@ public:
 
 	virtual void iteration();
 };
+
+
+}
 
 #endif /* BODY_H_ */

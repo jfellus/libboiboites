@@ -11,6 +11,8 @@
 #include <commands/Command.h>
 #include "../module/Document.h"
 
+namespace libboiboites {
+
 
 class CommandChangeGroup : public Command {
 public:
@@ -56,5 +58,7 @@ public:
 		return "Change group";
 	}
 };
+
+}
 
 #endif /* COMMANDCHANGEGROUP_H_ */

@@ -13,6 +13,10 @@
 #include <components/LinkComponent.h>
 #include "../module/Link.h"
 
+
+
+namespace libboiboites {
+
 class LinkLinkComponent;
 
 
@@ -31,6 +35,10 @@ public:
 	bool bPretty = false;
 	float opacity = 1;
 	bool noglows = false;
+	float arrow_size_selected = 2.5;
+	float arrow_size = 0.8;
+	float thickness_selected = 3;
+	float thickness = 0.5;
 
 	class Glow {
 	public:
@@ -58,6 +66,10 @@ public:
 		bPretty = false;
 		opacity = 1;
 		noglows = false;
+		arrow_size_selected = 2.5;
+		arrow_size = 0.8;
+		thickness_selected = 3;
+		thickness = 0.5;
 	}
 
 	virtual const char* name() {return "link";}
@@ -78,6 +90,10 @@ public:
 			else if(e->property=="noglow") noglows = (e->value=="true");
 			else if(e->property=="pretty") fromString(e->value, bPretty);
 			else if(e->property=="opacity") fromString(e->value, opacity);
+			else if(e->property=="arrow-size") fromString(e->value, arrow_size);
+			else if(e->property=="arrow-size-selected") fromString(e->value, arrow_size_selected);
+			else if(e->property=="thickness-selected") fromString(e->value, thickness_selected);
+			else if(e->property=="thickness") fromString(e->value, thickness);
 		}
 	}
 };
@@ -100,8 +116,18 @@ public:
 public:
 	virtual void render(Graphics& g);
 
+	virtual void translate(double dx, double dy, bool bFireEvent = false) {
+		LinkComponent::translate(dx, dy, bFireEvent);
+		link->on_change();
+	}
+
+
 	void scale(float s);
 };
 
 
+}
+
 #endif /* LINKLINKCOMPONENT_H_ */
+
+

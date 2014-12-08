@@ -12,6 +12,8 @@
 #include "../module/Document.h"
 #include "CommandPaste.h"
 
+namespace libboiboites {
+
 
 class CommandCopy : public Command {
 public:
@@ -48,5 +50,7 @@ public:
 
 
 };
+
+}
 
 #endif /* CommandCopy_H_ */

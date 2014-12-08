@@ -11,6 +11,8 @@
 #include <ZoomableDrawingArea.h>
 #include "../workbench/Workbench.h"
 
+namespace libboiboites {
+
 ChangeGroupCreator::ChangeGroupCreator() {
 	group = 0;
 }
@@ -52,3 +54,5 @@ void ChangeGroupCreator::on_mouse_move(GdkEventMotion* e) {
 	group = g;
 }
 
+
+}

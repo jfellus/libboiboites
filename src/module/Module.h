@@ -16,6 +16,9 @@
 #include <util/selection/ISelectionListener.h>
 #include <components/SVGComponent.h>
 
+
+namespace libboiboites {
+
 class Group;
 class IPropertiesListener;
 class Link;
@@ -103,6 +106,7 @@ std::ostream& operator<<(std::ostream& os, Module* a);
 
 
 
-
+}
 
 #endif /* MODULE_H_ */
+

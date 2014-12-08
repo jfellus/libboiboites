@@ -16,6 +16,9 @@
 #include <pthread.h>
 #include "../workbench/Workbench.h"
 
+
+namespace libboiboites {
+
 #undef DEFAULT_PORT
 #define DEFAULT_PORT 12215
 
@@ -81,9 +84,9 @@ static void on_load_finished (WebKitWebView  *web_view,  WebKitWebFrame *frame, 
 	((Browser*)user_data)->on_load();
 	if(ZoomableDrawingArea::cur()) ZoomableDrawingArea::cur()->grab_focus();
 }
-static void on_call_update_script(gpointer *o, gpointer *p) {
-	((Browser*)p)->do_update();
-}
+//static void on_call_update_script(gpointer *o, gpointer *p) {
+//	((Browser*)p)->do_update();
+//}
 
 
 Browser::Browser(const std::string& server_id) : Widget(gtk_scrolled_window_new(NULL,NULL)), server_id(server_id) {
@@ -92,10 +95,10 @@ Browser::Browser(const std::string& server_id) : Widget(gtk_scrolled_window_new(
     add(GTK_WIDGET(webkitview));
     gtk_widget_set_size_request(widget, 300, 0);
 
-    g_signal_connect(G_OBJECT(webkitview), "onload-event", G_CALLBACK(::on_load), this);
-    g_signal_connect(G_OBJECT(webkitview), "document-load-finished", G_CALLBACK(::on_load_finished), this);
-    g_signal_connect(G_OBJECT(webkitview), "load-finished", G_CALLBACK(::on_load), this);
-    g_signal_connect(G_OBJECT(webkitview), "notify::load-status", G_CALLBACK(::on_load), this);
+    g_signal_connect(G_OBJECT(webkitview), "onload-event", G_CALLBACK(libboiboites::on_load), this);
+    g_signal_connect(G_OBJECT(webkitview), "document-load-finished", G_CALLBACK(libboiboites::on_load_finished), this);
+    g_signal_connect(G_OBJECT(webkitview), "load-finished", G_CALLBACK(libboiboites::on_load), this);
+    g_signal_connect(G_OBJECT(webkitview), "notify::load-status", G_CALLBACK(libboiboites::on_load), this);
 
 
     if(!server) {
@@ -105,9 +108,9 @@ Browser::Browser(const std::string& server_id) : Widget(gtk_scrolled_window_new(
     if(server) server->add_browser(this);
     nbInstances++;
 
-    if(!g_signal_lookup("call-update-script", G_TYPE_OBJECT))
-    	g_signal_new("call-update-script", G_TYPE_OBJECT, G_SIGNAL_RUN_LAST, 0, NULL, NULL, g_cclosure_marshal_VOID__POINTER, G_TYPE_NONE, 1, G_TYPE_POINTER);
-    g_signal_connect(G_OBJECT(webkitview), "call-update-script", G_CALLBACK(::on_call_update_script), this);
+//    if(!g_signal_lookup("call-update-script", G_TYPE_OBJECT))
+//    	g_signal_new("call-update-script", G_TYPE_OBJECT, G_SIGNAL_RUN_LAST, 0, NULL, NULL, g_cclosure_marshal_VOID__POINTER, G_TYPE_NONE, 1, G_TYPE_POINTER);
+//    g_signal_connect(G_OBJECT(webkitview), "call-update-script", G_CALLBACK(::on_call_update_script), this);
 }
 
 Browser::~Browser() {
@@ -141,6 +144,16 @@ bool Browser::is_loaded() {
 	return bLoaded;
 }
 
+static int do_update(void* p) {
+	Browser* b = (Browser*)p;
+	b->do_update();
+	b->timeout_update = 0;
+	return FALSE;
+}
+
 void Browser::update() {
-	g_signal_emit_by_name(G_OBJECT(webkitview), "call-update-script", this);
+	if(!timeout_update) timeout_update = g_timeout_add(1, libboiboites::do_update, this);
+//	g_signal_emit_by_name(G_OBJECT(webkitview), "call-update-script", this);
+}
+
 }

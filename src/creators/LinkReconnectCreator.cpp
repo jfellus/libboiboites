@@ -11,6 +11,8 @@
 #include "../commands/CommandLinkReconnect.h"
 
 
+namespace libboiboites {
+
 LinkReconnectCreator::LinkReconnectCreator(Link* link) {
 	this->link = link;
 	link->hide();
@@ -64,3 +66,4 @@ void LinkReconnectCreator::on_mouse_move(GdkEventMotion* e) {
 	canvas->repaint();
 }
 
+}

@@ -12,6 +12,8 @@
 #include "../module/Module.h"
 #include "../module/Group.h"
 
+namespace libboiboites {
+
 class ModuleCreator : public Creator {
 public:
 	Module* module = 0;
@@ -27,5 +29,7 @@ public:
 
 	virtual void end();
 };
+
+}
 
 #endif /* MODULECREATOR_H_ */

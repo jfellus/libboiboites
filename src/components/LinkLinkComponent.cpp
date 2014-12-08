@@ -9,19 +9,24 @@
 #include <ZoomableDrawingArea.h>
 
 
+namespace libboiboites {
+
 //////////////////////////
 // STYLE IMPLEMENTATION //
 //////////////////////////
 
 
 LinkLinkComponent::LinkLinkComponent(Link* l, Component* src, Component* dst, std::string& text) : LinkComponent(src, dst), link(l), text(text) {
+	ready = false;
 		style = new LinkComponentStyle();
 		style->update(css_class);
+	ready = true;
 }
 
 
 void LinkLinkComponent::render(Graphics& g) {
 	LinkComponentStyle* style = (LinkComponentStyle*)this->style;
+	if(!style) return;
 
 	g.set_opacity(style->opacity);
 
@@ -63,8 +68,8 @@ void LinkLinkComponent::render(Graphics& g) {
 	g.set_color(style->color);
 	g.set_font(style->font_size, style->font, style->font_style);
 	if(style->dashed > 0) g.dash(style->dashed);
-	render_line(g, link->bSelected ? 3 : 1);
-	double t1 = render_arrow(g, _scale * (link->bSelected ? 3.5 : 1.5 ));
+	render_line(g, link->bSelected ? style->thickness_selected : style->thickness);
+	double t1 = render_arrow(g, _scale * (link->bSelected ? style->arrow_size_selected : style->arrow_size ));
 
 
 	Bezier b = bezier_absolute();
@@ -91,3 +96,4 @@ void LinkLinkComponent::render(Graphics& g) {
 void LinkLinkComponent::scale(float s) {_scale *=s; canvas->repaint();}
 
 
+}

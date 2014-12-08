@@ -13,6 +13,8 @@
 #include "Property.h"
 
 
+namespace libboiboites {
+
 class Link : public ISelectable, ISelectionListener, public IPropertiesElement {
 public:
 	LinkComponent* component;
@@ -49,6 +51,8 @@ public:
 		if(s->bSelected) ISelectable::select(); else ISelectable::unselect();
 	}
 
+	virtual void on_change() {}
+
 	virtual Link* copy();
 	virtual void attach();
 	virtual void detach(bool bSlave = false);
@@ -68,6 +72,7 @@ public:
 
 
 
+}
 
 
 #endif /* LINK_H_ */

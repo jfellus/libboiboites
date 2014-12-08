@@ -16,7 +16,7 @@
 
 
 
-
+namespace libboiboites {
 
 
 
@@ -268,4 +268,7 @@ void Group::attach() {
 	for(uint i = 0; i<children.size(); i++) if(children[i]->bDetachedSlave) children[i]->attach();
 	if(is_opened() && component_open) {component_open->show(); component->hide(); }
 	else if(!is_opened() && component) {component->show(); component_open->hide(); }
+}
+
+
 }

@@ -19,6 +19,8 @@
 #include "../../workbench/Workbench.h"
 
 
+namespace libboiboites {
+
 static int answer_to_connection (void *cls, struct MHD_Connection *connection,
 		const char *url, const char *method,
 		const char *version, const char *upload_data,
@@ -77,3 +79,4 @@ HTTPServer::~HTTPServer() {
 
 
 
+}

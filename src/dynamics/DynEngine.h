@@ -11,6 +11,8 @@
 #include <util/utils.h>
 #include "Body.h"
 
+namespace libboiboites {
+
 class DynEngine {
 public:
 	std::vector<Body*> bodies;
@@ -49,5 +51,7 @@ protected:
 		}
 	}
 };
+
+}
 
 #endif /* DYNENGINE_H_ */

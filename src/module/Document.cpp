@@ -17,6 +17,8 @@
 #include "../commands/CommandGroup.h"
 #include "../commands/CommandDelete.h"
 
+namespace libboiboites {
+
 static Document* _cur = 0;
 Document* Document::cur() {	return _cur;}
 
@@ -215,3 +217,4 @@ void Document::fire_change_event() {
 	ZoomableDrawingArea::cur()->repaint();
 }
 
+}

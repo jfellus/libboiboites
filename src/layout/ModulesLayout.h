@@ -10,6 +10,8 @@
 
 #include <util/utils.h>
 
+namespace libboiboites {
+
 class ModulesLayout {
 public:
 	ModulesLayout() {}
@@ -19,6 +21,9 @@ public:
 	virtual void layout() {
 	}
 };
+
+}
+
 
 #endif /* MODULESLAYOUT_H_ */
 

@@ -15,6 +15,10 @@
 
 class LinkComponent;
 
+namespace libboiboites {
+
+
+
 class LinkCreator : public Creator {
 protected:
 	Module *src=0, *dst=0;
@@ -28,4 +32,7 @@ public:
 	virtual void render(Graphics& g);
 };
 
+}
+
 #endif /* LINKCREATOR_H_ */
+
