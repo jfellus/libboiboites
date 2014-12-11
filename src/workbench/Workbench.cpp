@@ -56,6 +56,7 @@ void workbench_set_status(const std::string& text) {
 
 static void on_new() 	{	Workbench::cur()->new_document();								}
 static void on_open() 	{	Workbench::cur()->open();										}
+static void on_reopen() {	Workbench::cur()->reopen();										}
 static void on_close() 	{	Workbench::cur()->close();										}
 static void on_saveas()	{	Workbench::cur()->save_as();									}
 static void on_save()	{	Workbench::cur()->save();										}
@@ -96,6 +97,28 @@ static void _on_update() {
 // WORKBENCH CLASS //
 /////////////////////
 
+static pthread_mutex_t mut = PTHREAD_MUTEX_INITIALIZER;
+static pthread_t locker = 0;
+static int nlocks = 0;
+void Workbench::LOCK() {
+	if(locker==pthread_self()) {nlocks++;return;}
+	pthread_mutex_lock(&mut);
+	locker = pthread_self();
+//	f_write_line("workbench_locker.txt", GET_STACK_TRACE());
+	nlocks++;
+}
+void Workbench::UNLOCK() {
+	nlocks--;
+	if(nlocks<=0) {
+		locker = 0;
+		pthread_mutex_unlock(&mut);
+	}
+}
+bool Workbench::IS_LOCKED() {
+	return locker==pthread_self();
+}
+
+
 
 Workbench::Workbench() {
 	_cur = this;
@@ -118,9 +141,13 @@ Workbench::Workbench() {
 	canvas->add_key_listener(new IKeyListener(GDK_KEY_m, 0, on_create_module));
 	canvas->add_key_listener(new IKeyListener(GDK_KEY_l, 0, on_create_link));
 	canvas->add_key_listener(new IKeyListener(GDK_KEY_r, 0, on_reconnect_link));
+	canvas->add_key_listener(new IKeyListener(GDK_KEY_a, 0, on_align_selection));
 	canvas->add_key_listener(new IKeyListener(GDK_KEY_s, GDK_CONTROL_MASK, on_save));
 	canvas->add_key_listener(new IKeyListener(GDK_KEY_s, GDK_CONTROL_MASK | GDK_SHIFT_MASK, on_saveas));
-	canvas->add_key_listener(new IKeyListener(GDK_KEY_a, 0, on_align_selection));
+	canvas->add_key_listener(new IKeyListener(GDK_KEY_o, GDK_CONTROL_MASK, on_open));
+	canvas->add_key_listener(new IKeyListener(GDK_KEY_r, GDK_CONTROL_MASK, on_reopen));
+	canvas->add_key_listener(new IKeyListener(GDK_KEY_w, GDK_CONTROL_MASK, on_close));
+	canvas->add_key_listener(new IKeyListener(GDK_KEY_n, GDK_CONTROL_MASK, on_new));
 
 	canvas->add_scroll_listener(new IScrollListener(GDK_CONTROL_MASK|GDK_SHIFT_MASK, libboiboites::on_space_selection));
 
@@ -230,6 +257,10 @@ void Workbench::close() {
 void Workbench::open() {
 	std::string filename = open_file_dialog(win->widget);
 	if(!filename.empty()) open(filename);
+}
+
+void Workbench::reopen() {
+	if(!cur_filename.empty()) open(cur_filename);
 }
 
 void Workbench::save_as() {

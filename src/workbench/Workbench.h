@@ -43,6 +43,10 @@ public:
 	Workbench();
 	virtual ~Workbench();
 
+	void LOCK();
+	void UNLOCK();
+	bool IS_LOCKED();
+
 	// Accessors
 
 	std::vector<Module*>* get_selected_modules() {return &Document::cur()->selected_modules;}
@@ -98,6 +102,7 @@ public:
 	virtual void close();
 	virtual void save() { save_as(); }
 	virtual void open();
+	virtual void reopen();
 	virtual void save_as();
 	void open(const std::string& filename);
 	void save(const std::string& filename);

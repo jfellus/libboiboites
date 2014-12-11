@@ -27,24 +27,26 @@ public:
 	static bool _sort_y(Module* c1, Module* c2) {	return c1->component->center().y < c2->component->center().y;}
 
 	CommandAlignSelection(Document* doc) : doc(doc), modules(doc->selected_modules) {
-		maxx = modules[0]->component->center().x;
-		minx = modules[0]->component->center().x;
-		maxy = modules[0]->component->center().y;
-		miny = modules[0]->component->center().y;
+		Vector2D c = modules[0]->component->center();
+		maxx = c.x;
+		minx = c.x;
+		maxy = c.y;
+		miny = c.y;
 
 		for(uint i=0; i<modules.size(); i++) {
-			old_pos.push_back(modules[i]->component->center());
-			center += modules[i]->component->center();
-			modules[i]->component->center();
-			if(modules[i]->component->center().x > maxx) maxx = modules[i]->component->center().x;
-			if(modules[i]->component->center().x < minx) minx = modules[i]->component->center().x;
-			if(modules[i]->component->center().y > maxy) maxy = modules[i]->component->center().y;
-			if(modules[i]->component->center().y < miny) miny = modules[i]->component->center().y;
+			c = modules[i]->component->center();
+			center += c;
+			if(c.x > maxx) maxx = c.x;
+			if(c.x < minx) minx = c.x;
+			if(c.y > maxy) maxy = c.y;
+			if(c.y < miny) miny = c.y;
 		}
 		center /= modules.size();
 		evenly_is_x = (maxx-minx > maxy-miny);
 
 		std::sort(modules.begin(), modules.end(), evenly_is_x ? _sort_x : _sort_y);
+
+		for(uint i=0; i<modules.size(); i++) old_pos.push_back(modules[i]->component->center());
 	}
 
 	virtual ~CommandAlignSelection() {}

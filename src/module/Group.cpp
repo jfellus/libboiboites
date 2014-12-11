@@ -173,7 +173,7 @@ Rectangle Group::get_bounds() {
 	if(opened) {
 		Rectangle r = get_children_bounds();
 		Rectangle r2 = component_open->get_handle_bounds(r);
-		r.add(r2); r.augment(370);
+		r.add(r2); r.augment(((GroupOpenComponentStyle*)component_open->style)->padding);
 		return r;
 	}
 	else return component->get_bounds();

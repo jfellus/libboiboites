@@ -384,10 +384,18 @@ void Window::message_box(const std::string& s) {
 }
 
 
+std::string _do_set_status_text;
+static int _do_set_status(void* p) {
+	Window* w = (Window*)p;
+	w->canvas->LOCK();
+	gtk_statusbar_remove_all(GTK_STATUSBAR(w->status), 0);
+	gtk_statusbar_push(GTK_STATUSBAR(w->status), 0, _do_set_status_text.c_str());
+	w->canvas->UNLOCK();
+	return FALSE;
+}
 void Window::set_status(const std::string& text) {
 	canvas->LOCK();
-	gtk_statusbar_remove_all(GTK_STATUSBAR(status), 0);
-	gtk_statusbar_push(GTK_STATUSBAR(status), 0, text.c_str());
+	g_timeout_add(1, _do_set_status, this);
 	canvas->UNLOCK();
 }
 

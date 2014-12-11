@@ -32,6 +32,7 @@ public:
 	RGB selected_color; bool bSelectedColor = false;
 	float alpha = 1;
 	float opacity = 1;
+	float padding = 370;
 
 	int dashed = true;
 	bool bRounded = false;
@@ -47,6 +48,7 @@ public:
 		dashed = 1;
 		bRounded = false;
 		alpha = opacity = 1;
+		padding = 370;
 	}
 
 	virtual const char* name() {return "group:open";}
@@ -66,6 +68,7 @@ public:
 			else if(e->property=="dashed") {fromString(e->value, dashed);}
 			else if(e->property=="alpha") {fromString(e->value, alpha);}
 			else if(e->property=="opacity") {fromString(e->value, opacity);}
+			else if(e->property=="padding") {fromString(e->value, padding);}
 		}
 	}
 };
