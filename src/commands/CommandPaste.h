@@ -89,6 +89,8 @@ public:
 	static Pastable* cur_pastable;
 
 public:
+
+
 	CommandPaste(Document* doc, double x, double y) : doc(doc), x(x), y(y) {
 		pastable = cur_pastable;
 		if(pastable->used) {pastable = cur_pastable = pastable->copy();}

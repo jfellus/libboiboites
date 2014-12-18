@@ -98,11 +98,11 @@ void Group::open() {
 		else if(l->src->parent == this) {l->component->src = l->src->component; l->show();}
 		else if(l->dst->parent == this) {l->component->dst = l->dst->component; l->show();}
 	}
-	component->hide();
-	component_open->show();
+	if(!bDeleted) component->hide();
+	if(!bDeleted) component_open->show();
 	opened = true;
 	Document::cur()->unselect_all();
-	component_open->select(true);
+	if(!bDeleted) component_open->select(true);
 	Document::cur()->fire_change_event();
 }
 
