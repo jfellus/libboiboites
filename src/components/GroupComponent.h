@@ -104,7 +104,7 @@ public:
 		if(!visible) return;
 		if(!translating && !group->translating) {
 			translating = true;
-			group->translate(dx,dy);
+			group->translate(dx,dy, bFireEvent);
 			translating = false;
 		}
 		else SVGComponent::translate(dx,dy,bFireEvent);

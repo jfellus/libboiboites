@@ -103,6 +103,7 @@ void Group::open() {
 	opened = true;
 	Document::cur()->unselect_all();
 	if(!bDeleted) component_open->select(true);
+	on_change();
 	Document::cur()->fire_change_event();
 }
 
@@ -120,6 +121,7 @@ void Group::close() {
 	component_open->hide();
 	component->center(r.center());
 	visible = true;
+	on_change();
 	Document::cur()->fire_change_event();
 }
 

@@ -121,6 +121,8 @@ public:
 	virtual void paste();
 	virtual void cut();
 
+	virtual void edit(bool bEdit = true);
+
 
 	// Runtime
 

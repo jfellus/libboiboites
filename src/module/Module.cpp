@@ -28,10 +28,7 @@ Module::~Module() {
 	if(parent!=NULL) {
 		Group* g = parent;
 		g->remove(this);
-		if(g->children.size()==0 && !g->bDeleted) {
-			DBG("then Delete " << g);
-			delete g;
-		}
+		if(g->children.size()==0 && !g->bDeleted) delete g;
 	}
 	Document::cur()->remove_module(this);
 	delete component;

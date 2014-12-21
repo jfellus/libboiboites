@@ -62,6 +62,9 @@ Window::Window() : Widget(NULL){
 	GtkWidget* b = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
 	menubar = gtk_menu_bar_new();
 	toolbar = gtk_toolbar_new();
+		gtk_toolbar_set_style(GTK_TOOLBAR(toolbar), GTK_TOOLBAR_ICONS);
+		gtk_container_set_border_width(GTK_CONTAINER(toolbar), 0);
+		gtk_toolbar_set_icon_size(GTK_TOOLBAR(toolbar),GTK_ICON_SIZE_MENU);
 	status = gtk_statusbar_new();
 	rightpane = gtk_notebook_new();
 
@@ -188,6 +191,74 @@ void Window::remove_menu(const char* menustr, int offset) {
 	if(item==NULL) return;
 	gtk_container_remove(GTK_CONTAINER(curmenu), item);
 }
+
+void Window::add_toolbar(const std::string& name, const std::string& btn_icon, void (*callback)(GtkToolItem*, void*), void* param) {
+	GtkWidget* icon = gtk_image_new_from_file(btn_icon.c_str());
+	GtkToolItem* b = gtk_tool_button_new(icon, name.c_str());
+	gtk_container_set_border_width(GTK_CONTAINER(b), 0);
+	gtk_widget_set_size_request(GTK_WIDGET(b), 20,20);
+	gtk_widget_set_tooltip_text(GTK_WIDGET(b), name.c_str());
+	g_signal_connect(G_OBJECT(b), "clicked", G_CALLBACK(callback), param);
+	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), b, -1);
+}
+
+
+void Window::add_toolbar(const std::string& name, const std::string& btn_icon, void (*callback)(GtkToolItem*, void*), void* param, int before) {
+	GtkWidget* icon = gtk_image_new_from_file(btn_icon.c_str());
+	GtkToolItem* b = gtk_tool_button_new(icon, name.c_str());
+	gtk_container_set_border_width(GTK_CONTAINER(b), 0);
+	gtk_widget_set_size_request(GTK_WIDGET(b), 20,20);
+	gtk_widget_set_tooltip_text(GTK_WIDGET(b), name.c_str());
+	g_signal_connect(G_OBJECT(b), "clicked", G_CALLBACK(callback), param);
+	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), b, before);
+}
+
+void Window::add_toolbar(const std::string& name, const std::string& btn_icon, void (*callback)()) {
+	GtkWidget* icon = gtk_image_new_from_file(btn_icon.c_str());
+	GtkToolItem* b = gtk_tool_button_new(icon, name.c_str());
+	gtk_container_set_border_width(GTK_CONTAINER(b), 0);
+	gtk_widget_set_size_request(GTK_WIDGET(b), 20,20);
+	gtk_widget_set_tooltip_text(GTK_WIDGET(b), name.c_str());
+	g_signal_connect(G_OBJECT(b), "clicked", G_CALLBACK(callback), NULL);
+	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), b, -1);
+}
+
+void Window::add_toolbar(const std::string& name) {
+	GtkToolItem* b = gtk_separator_tool_item_new();
+	gtk_container_set_border_width(GTK_CONTAINER(b), 0);
+	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), b, -1);
+}
+
+void Window::add_toolbar(const std::string& name, const std::string& btn_icon, void (*callback)(), int before) {
+	GtkWidget* icon = gtk_image_new_from_file(btn_icon.c_str());
+	GtkToolItem* b = gtk_tool_button_new(icon, name.c_str());
+	gtk_container_set_border_width(GTK_CONTAINER(b), 0);
+	gtk_widget_set_size_request(GTK_WIDGET(b), 20,20);
+	gtk_widget_set_tooltip_text(GTK_WIDGET(b), name.c_str());
+	g_signal_connect(G_OBJECT(b), "clicked", G_CALLBACK(callback), NULL);
+	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), b, before);
+}
+
+int Window::get_toolbar_pos(const std::string& name) {
+	GList* l = gtk_container_get_children(GTK_CONTAINER(toolbar));
+	int i=0;
+	for(GList * elem = l; elem; elem = elem->next) {
+		if(!GTK_IS_TOOL_BUTTON(elem->data)) {i++; continue;}
+		if(name==gtk_tool_button_get_label(GTK_TOOL_BUTTON(elem->data))) return i;
+		i++;
+	}
+	return -1;
+}
+
+void Window::enable_toolbar(const std::string& name, bool bEnable) {
+	GList* l = gtk_container_get_children(GTK_CONTAINER(toolbar));
+	for(GList * elem = l; elem; elem = elem->next) {
+		if(name==gtk_tool_button_get_label(GTK_TOOL_BUTTON(l->data)))
+			{gtk_widget_set_sensitive(GTK_WIDGET(l->data), bEnable); return;}
+	}
+}
+
+
 
 void Window::add_menu(const char* menustr, void (*callback)(), int pos, int accelerator_key) {
 	GtkWidget* curmenu = menubar;

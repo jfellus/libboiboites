@@ -43,11 +43,19 @@ public:
 
 	void add_menu(const char* menustr, void (*callback)(), int pos = -1, int accelerator_key = 0);
 	void add_menu(const char* menustr, void (*callback)(GtkMenuItem*,void*), void* param, int pos = -1, int accelerator_key = 0);
-
 	std::string get_menu(const char* menustr, int offset);
 	void remove_menu(const char* menustr, int offset);
 	int get_menu_pos(const char* menustr);
 	void enable_menu(const char* menustr, bool bEnable = true);
+
+
+	void add_toolbar(const std::string& name, const std::string& btn_icon, void (*callback)(GtkToolItem*, void*), void* param);
+	void add_toolbar(const std::string& name, const std::string&  btn_icon, void (*callback)());
+	void add_toolbar(const std::string& name, const std::string& btn_icon, void (*callback)(GtkToolItem*, void*), void* param, int before);
+	void add_toolbar(const std::string& name, const std::string&  btn_icon, void (*callback)(), int before);
+	void add_toolbar(const std::string& name);
+	int get_toolbar_pos(const std::string& name);
+	void enable_toolbar(const std::string& name, bool bEnable = true);
 
 	void add_tab(Widget* w, const std::string& title);
 	void show_tab(int i);

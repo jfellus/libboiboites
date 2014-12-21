@@ -65,9 +65,13 @@ static int answer_to_connection (void *cls, struct MHD_Connection *connection,
 
 
 HTTPServer::HTTPServer(int port) {
-	this->port = port;
-	daemon = MHD_start_daemon (MHD_USE_SELECT_INTERNALLY, port, NULL, NULL,
-			&answer_to_connection, this, MHD_OPTION_END);
+	daemon = NULL;
+	for(this->port = port; daemon==NULL && this->port < port+20;) {
+		daemon = MHD_start_daemon (MHD_USE_SELECT_INTERNALLY, this->port, NULL, NULL,
+				&answer_to_connection, this, MHD_OPTION_END);
+		if(daemon==NULL) this->port++;
+	}
+
 	if (NULL == daemon) throw "Can't init HTTP Server";
 }
 

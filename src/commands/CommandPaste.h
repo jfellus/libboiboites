@@ -59,15 +59,9 @@ public:
 		for(uint i=0; i<modules.size(); i++) {
 			Module* m = modules[i];
 			clipboard_modules.push_back(m);
-			clipboard_center += Vector2D(m->component->x,m->component->y);
+			clipboard_center += m->component->center();
 		}
-		for(uint i=0; i<links.size(); i++) {
-			Link* l = links[i];
-			clipboard_links.push_back(l);
-			clipboard_center += Vector2D(l->src->component->x,l->src->component->y);
-			clipboard_center += Vector2D(l->dst->component->x,l->dst->component->y);
-		}
-		clipboard_center /= links.size()*2 + modules.size();
+		clipboard_center /= modules.size();
 	}
 
 protected:
@@ -75,7 +69,7 @@ protected:
 		Module* m = module->copy();
 		copyof[module] = m;
 		clipboard_modules.push_back(m);
-		clipboard_center += Vector2D(m->component->x,m->component->y);
+		clipboard_center += m->component->center();
 		m->detach();
 	}
 };
@@ -100,8 +94,7 @@ public:
 
 		for(uint i=0; i<pastable->clipboard_modules.size(); i++) {
 			Module* m = pastable->clipboard_modules[i];
-			m->component->x = x + (m->component->x - pastable->clipboard_center.x);
-			m->component->y = y + (m->component->y - pastable->clipboard_center.y);
+			m->component->center(Vector2D(x,y) + m->component->center() - pastable->clipboard_center);
 			if(m->parent) m->parent->remove(m);
 			if(group) group->add(m);
 		}

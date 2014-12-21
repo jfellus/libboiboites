@@ -81,6 +81,8 @@ public:
 	Properties() {}
 	virtual ~Properties() {}
 
+	void clear() { v.clear(); }
+
 	void add(Property* p, const std::string& format = "") {
 		p->format = format;
 		if(get(p->name)) {DBG("Property key already exists : " << p->name);return;}

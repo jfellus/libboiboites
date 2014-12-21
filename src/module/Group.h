@@ -83,6 +83,8 @@ public:
 
 	virtual void dump(std::ostream& os) { os << "Group " << (void*)this << " (" << children.size() << ")"; }
 	virtual void create_component(const char* component_spec);
+
+	virtual void on_change() {}
 };
 
 

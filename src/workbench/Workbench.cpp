@@ -60,12 +60,23 @@ static void on_reopen() {	Workbench::cur()->reopen();										}
 static void on_close() 	{	Workbench::cur()->close();										}
 static void on_saveas()	{	Workbench::cur()->save_as();									}
 static void on_save()	{	Workbench::cur()->save();										}
+static void on_copy() 	{	Workbench::cur()->copy();										}
+static void on_paste() 	{	Workbench::cur()->paste();										}
+static void on_cut() 	{	Workbench::cur()->cut(); 										}
 
 static void on_undo() {
-	JOB_SUBMIT("Undo", {CommandStack::undo(); Workbench::cur()->win->enable_menu("_Edit>_Undo",CommandStack::can_undo());});
+	JOB_SUBMIT("Undo", {
+			CommandStack::undo();
+			Workbench::cur()->win->enable_menu("_Edit>_Undo",CommandStack::can_undo());
+			Workbench::cur()->win->enable_toolbar("undo",CommandStack::can_undo());
+	});
 }
 static void on_redo() {
-	JOB_SUBMIT("Redo", {CommandStack::redo(); Workbench::cur()->win->enable_menu("_Edit>_Redo",CommandStack::can_redo());});
+	JOB_SUBMIT("Redo", {
+			CommandStack::redo();
+			Workbench::cur()->win->enable_menu("_Edit>_Redo",CommandStack::can_redo());
+			Workbench::cur()->win->enable_toolbar("redo",CommandStack::can_redo());
+	});
 }
 
 static void on_group() {	JOB_SUBMIT("Group",  Workbench::cur()->group_selection()); }
@@ -148,6 +159,10 @@ Workbench::Workbench() {
 	canvas->add_key_listener(new IKeyListener(GDK_KEY_r, GDK_CONTROL_MASK, on_reopen));
 	canvas->add_key_listener(new IKeyListener(GDK_KEY_w, GDK_CONTROL_MASK, on_close));
 	canvas->add_key_listener(new IKeyListener(GDK_KEY_n, GDK_CONTROL_MASK, on_new));
+	canvas->add_key_listener(new IKeyListener(GDK_KEY_v, GDK_CONTROL_MASK, on_paste));
+	canvas->add_key_listener(new IKeyListener(GDK_KEY_c, GDK_CONTROL_MASK, on_copy));
+	canvas->add_key_listener(new IKeyListener(GDK_KEY_x, GDK_CONTROL_MASK, on_cut));
+
 
 	canvas->add_scroll_listener(new IScrollListener(GDK_CONTROL_MASK|GDK_SHIFT_MASK, libboiboites::on_space_selection));
 
@@ -175,6 +190,9 @@ Workbench::Workbench() {
 		};
 		CommandStack::add_listener(new CSL(win));
 	win->add_menu("_Edit>__",NULL);
+	win->add_menu("_Edit>C_ut", on_cut);
+	win->add_menu("_Edit>Copy", on_copy);
+	win->add_menu("_Edit>Paste", on_paste);
 	win->add_menu("_Edit>_Delete selection",on_delete);
 
 	win->add_menu("_Create>_Module", on_create_module);
@@ -190,6 +208,23 @@ Workbench::Workbench() {
 	win->add_menu("_View>Zoom All" , on_zoom_all);
 	win->add_menu("_View>__", NULL);
 	win->add_menu("_View>Display all modules details", on_display_all_modules_details);
+
+
+	win->add_toolbar("new", TOSTRING(main_dir() << "/style/icons/" << "new.gif"), on_new);
+	win->add_toolbar("open", TOSTRING(main_dir() << "/style/icons/" << "open.gif"), on_open);
+	win->add_toolbar("save", TOSTRING(main_dir() << "/style/icons/" << "save.gif"), on_save);
+	win->add_toolbar("save as", TOSTRING(main_dir() << "/style/icons/" << "save_as.gif"), on_saveas);
+	win->add_toolbar("__");
+	win->add_toolbar("undo", TOSTRING(main_dir() << "/style/icons/" << "undo.gif"), on_undo);
+	win->add_toolbar("redo", TOSTRING(main_dir() << "/style/icons/" << "redo.gif"), on_redo);
+	win->add_toolbar("cut", TOSTRING(main_dir() << "/style/icons/" << "cut.gif"), on_cut);
+	win->add_toolbar("copy", TOSTRING(main_dir() << "/style/icons/" << "copy.gif"), on_copy);
+	win->add_toolbar("paste", TOSTRING(main_dir() << "/style/icons/" << "paste.gif"), on_paste);
+	win->add_toolbar("delete", TOSTRING(main_dir() << "/style/icons/" << "delete.gif"), on_delete);
+	win->add_toolbar("__");
+	win->add_toolbar("new module", TOSTRING(main_dir() << "/style/icons/" << "new_module.gif"), on_create_module);
+	win->add_toolbar("new link", TOSTRING(main_dir() << "/style/icons/" << "new_link.gif"), on_create_link);
+
 
 
 	document = new Document();
@@ -368,6 +403,14 @@ void Workbench::align_selection() {
 	(new CommandAlignSelection(document))->execute();
 }
 
+void Workbench::edit(bool bEdit) {
+	if(bEdit) {
+		win->show_rightpane();
+		win->show_tab(0);
+	}
+	else win->hide_rightpane();
+}
+
 
 
 
@@ -393,11 +436,8 @@ void Workbench::on_property_change(IPropertiesElement* m, const std::string& nam
 }
 
 void Workbench::on_dbl_click(Component* c) {
-	if(c) {
-		win->show_rightpane();
-		win->show_tab(0);
-	}
-	else win->hide_rightpane();
+	if(c) edit();
+	else edit(false);
 }
 
 
