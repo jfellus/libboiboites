@@ -23,7 +23,7 @@ namespace libboiboites {
 class GroupOpenComponentStyle : public IStyle {
 public:
 	std::string font = "Serif";
-	uint font_size = 400;
+	uint font_size = 40;
 
 	RGB color = RGB(0.7,0.7,0.7);
 	RGB fill_color; bool bFillColor = false;
@@ -32,7 +32,7 @@ public:
 	RGB selected_color; bool bSelectedColor = false;
 	float alpha = 1;
 	float opacity = 1;
-	float padding = 370;
+	float padding = 37;
 
 	int dashed = true;
 	bool bRounded = false;
@@ -42,13 +42,13 @@ public:
 	virtual ~GroupOpenComponentStyle(){}
 
 	virtual void default_style() {
-		font = "Serif"; font_size = 400;
+		font = "Serif"; font_size = 40;
 		color = RGB(0.7,0.7,0.7);
 		bFillColor = bFillHandleColor = bTextColor = bSelectedColor = false;
 		dashed = 1;
 		bRounded = false;
 		alpha = opacity = 1;
-		padding = 370;
+		padding = 37;
 	}
 
 	virtual const char* name() {return "group:open";}
@@ -164,7 +164,8 @@ public:
 	virtual void dump(std::ostream& os) { os << "GroupComponent(" << group << ")";}
 
 	virtual Rectangle get_bounds() {
-		return group->get_children_bounds(true).augment(400);
+		GroupOpenComponentStyle* style = (GroupOpenComponentStyle*)this->style;
+		return group->get_children_bounds(true).augment(style->padding);
 	}
 
 	Rectangle get_handle_bounds(Rectangle bounds) {
@@ -177,10 +178,10 @@ public:
 			g.set_font(style->font_size / f *0.7, style->font);
 			e = g.text_extents(group->text);
 		}
-		bounds.x += bounds.w - e.w - 250;
-		bounds.y -= e.h + 250;
-		bounds.w  = e.w + 400;
-		bounds.h = e.h + 250;
+		bounds.x += bounds.w - e.w - 25;
+		bounds.y -= e.h + 25;
+		bounds.w  = e.w + 40;
+		bounds.h = e.h + 25;
 		return bounds;
 	}
 

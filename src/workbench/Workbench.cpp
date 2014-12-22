@@ -22,6 +22,7 @@
 #include "../commands/CommandAlignSelection.h"
 #include "Job.h"
 #include <X11/Xlib.h>
+#include "../widget/Popup.h"
 
 namespace libboiboites {
 
@@ -48,6 +49,9 @@ void workbench_set_status(const std::string& text) {
 	if(Workbench::cur()) Workbench::cur()->win->set_status(text);
 }
 
+void _POPUP(const std::string& msg) {
+	if(Workbench::cur()) Workbench::cur()->popup(msg);
+}
 
 
 ///////////////
@@ -266,6 +270,12 @@ void Workbench::set_title(const std::string& title) {
 	win->set_title(title);
 }
 
+void Workbench::update_title() {
+	if(document && !document->filename.empty())
+		set_title(TOSTRING(application_name << " - " << document->filename << (document->bChanged ? "*" : "")));
+	else set_title(application_name);
+}
+
 
 void Workbench::toggle_display_all_modules_details() {
 	ModuleComponent::toggle_display_mode();
@@ -273,6 +283,34 @@ void Workbench::toggle_display_all_modules_details() {
 
 bool Workbench::question(const std::string& msg) {
 	return question_dialog(win->widget, msg);
+}
+
+
+
+static std::string _do_popup_str;
+static Popup* cur_popup = NULL;
+static int _do_popup(void* p) {
+	ZoomableDrawingArea::cur()->LOCK();
+	if(cur_popup !=NULL) delete cur_popup;
+	cur_popup = new Popup(_do_popup_str);
+	ZoomableDrawingArea::cur()->UNLOCK();
+	return FALSE;
+}
+
+static int _blur_popup(void* p) {
+	ZoomableDrawingArea::cur()->LOCK();
+	if(cur_popup !=NULL) delete cur_popup;
+	cur_popup = NULL;
+	ZoomableDrawingArea::cur()->UNLOCK();
+	return FALSE;
+}
+
+void Workbench::popup(const std::string& msg) {
+//	canvas->LOCK();
+	_do_popup_str = msg;
+	g_timeout_add(0, _do_popup, this);
+	g_timeout_add(1500, _blur_popup, NULL);
+//	canvas->UNLOCK();
 }
 
 
@@ -295,7 +333,7 @@ void Workbench::open() {
 }
 
 void Workbench::reopen() {
-	if(!cur_filename.empty()) open(cur_filename);
+	if(document && !document->filename.empty()) open(document->filename);
 }
 
 void Workbench::save_as() {
@@ -311,13 +349,13 @@ void Workbench::save_as() {
 }
 
 void Workbench::open(const std::string& filename) {
-	cur_filename = filename;
-	JOB_SUBMIT(TOSTRING("Open " << filename),Workbench::cur()->do_open(Workbench::cur()->cur_filename));
+	document->open(filename);
+	JOB_SUBMIT(TOSTRING("Open " << filename),Workbench::cur()->do_open(Document::cur()->filename));
 }
 
 void Workbench::save(const std::string& filename) {
-	cur_filename = filename;
-	JOB_SUBMIT(TOSTRING("Save " << filename),Workbench::cur()->do_save(Workbench::cur()->cur_filename));
+	document->save(filename);
+	JOB_SUBMIT(TOSTRING("Save " << filename),Workbench::cur()->do_save(Document::cur()->filename));
 }
 
 
@@ -424,6 +462,7 @@ void Workbench::on_selection_change() {
 }
 
 void Workbench::on_document_change() {
+	update_title();
 	update();
 }
 

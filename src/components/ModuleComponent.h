@@ -29,14 +29,14 @@ namespace libboiboites {
 class ModuleComponentStyle : public IStyle {
 public:
 	std::string font = "Serif";
-	uint font_size = 200;
+	uint font_size = 20;
 	uint flags = 0;
 	int font_style = 0;
 	RGB text_color = RGB_BLACK;
 	bool bPretty = false;
 	float opacity = 1;
 	bool noglows = false;
-	uint text2_font_size = 100;
+	uint text2_font_size = 10;
 	int text2_font_style = 0x001;
 	RGB text2_color = RGB(0.5,0.5,0.5);
 	std::string text2_font = "Serif";
@@ -61,14 +61,14 @@ public:
 	virtual ~ModuleComponentStyle(){}
 
 	virtual void default_style() {
-		font = "Serif"; font_size = 200; flags = 0;
+		font = "Serif"; font_size = 20; flags = 0;
 		glows.clear();
 		text_color = RGB_BLACK;
 		bPretty = false;
 		font_style = 0;
 		opacity = 1;
 		noglows = false;
-		text2_color = RGB(0.5,0.5,0.5); text2_font = "Serif"; text2_font_size = 100; text2_font_style = 0x001;
+		text2_color = RGB(0.5,0.5,0.5); text2_font = "Serif"; text2_font_size = 10; text2_font_style = 0x001;
 		bNotext = false;
 	}
 

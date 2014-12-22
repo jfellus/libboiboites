@@ -87,7 +87,7 @@ void LinkLinkComponent::render(Graphics& g) {
 		if(t2==-1) t2 = b.intersect_location(src->get_bounds());
 		if(t2==-1) t2 = 0;
 		Vector2D p = b.get((t1+t2)/2);
-		Rectangle r(p.x, p.y+60, 0,0);
+		Rectangle r(p.x, p.y+6, 0,0);
 		r.x /= _scale; r.y /= _scale;
 		g.text(link->text, r);
 	}

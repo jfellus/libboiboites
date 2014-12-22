@@ -85,15 +85,15 @@ void ModuleComponent::render_text_1(Graphics& g) {
 	if(!style->bNotext) {
 		g.set_color(style->text_color);
 		g.set_font(style->font_size, style->font, style->font_style);
-		if(style->flags & MODULECOMPONENTSTYLE_BOTTOM) { r.y += r.h; r.h = g.text_extents(text).h/2; r.y += 80;}
-		if(!text2.empty()) r.y += 130;
+		if(style->flags & MODULECOMPONENTSTYLE_BOTTOM) { r.y += r.h; r.h = g.text_extents(text).h/2; r.y += 8;}
+		if(!text2.empty()) r.y += 13;
 		g.text(text, r);
 	}
 
 	g.set_color(style->text2_color);
 	g.set_font(style->text2_font_size, style->text2_font, style->text2_font_style);
 	r = bounds;
-	if(style->flags & MODULECOMPONENTSTYLE_BOTTOM) { r.y += r.h; r.h = g.text_extents(text).h/2; r.y += 80;}
+	if(style->flags & MODULECOMPONENTSTYLE_BOTTOM) { r.y += r.h; r.h = g.text_extents(text).h/2; r.y += 8;}
 	g.text(text2, r);
 }
 

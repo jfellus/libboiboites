@@ -25,6 +25,14 @@ class Link;
 
 class Module : public ISelectable, public ISelectionListener, public IPropertiesElement {
 public:
+	class IChangeListener {
+	public:
+		IChangeListener() {}
+		virtual ~IChangeListener() {}
+		virtual void on_module_change(Module* m) = 0;
+	};
+
+public:
 	Component* component;
 	Group* parent = NULL;
 
@@ -41,6 +49,8 @@ public:
 
 	bool bLock = false;
 
+	std::vector<IChangeListener*> changeListeners;
+
 public:
 	Module();
 	virtual ~Module();
@@ -49,6 +59,9 @@ public:
 	bool is_ancestor(Module* m);
 
 	virtual Rectangle get_bounds() { return component->get_bounds(); }
+
+
+	void add_change_listener(IChangeListener* l) {changeListeners.push_back(l);}
 
 
 	virtual void toggle_class(const std::string& cls) {	component->toggle_class(cls);	}
@@ -96,6 +109,8 @@ public:
 
 
 	virtual void on_parent_change(Group* newparent) {}
+	void fire_change_event() {for(uint i=0; i<changeListeners.size(); i++) changeListeners[i]->on_module_change(this);}
+
 public:
 	bool bDetachedSlave = false;
 };

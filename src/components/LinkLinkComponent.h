@@ -27,7 +27,7 @@ class LinkLinkComponent;
 class LinkComponentStyle : public IStyle {
 public:
 	RGB color = RGB_BLACK;
-	uint font_size = 200;
+	uint font_size = 20;
 	std::string font = "Serif";
 	int font_style = 0;
 	int slashes = 0;
@@ -59,7 +59,7 @@ public:
 
 	virtual void default_style() {
 		color  = RGB_BLACK;
-		font_size = 200; font_style = 0;
+		font_size = 20; font_style = 0;
 		font = "Serif";
 		slashes = dashed = 0;
 		glows.clear();

@@ -20,7 +20,7 @@
 namespace libboiboites {
 
 
-class Document : public IPropertiesListener, ISelectionListener {
+class Document : public IPropertiesListener, ISelectionListener, Module::IChangeListener {
 public:
 
 	///////////////
@@ -50,13 +50,18 @@ public:
 	std::vector<IPropertiesListener*> propertiesListeners;
 	std::vector<IDocumentChangeListener*> change_listeners;
 
-
+	std::string filename = "";
+	bool bChanged = FALSE;
 
 public:
 	static Document* cur();
 	Document();
 	virtual ~Document() {}
 
+
+	void new_document();
+	void save(const std::string& filename);
+	void open(const std::string& filename);
 
 	// Accessors
 
@@ -104,6 +109,7 @@ public:
 	virtual void on_dbl_click(ISelectable* s, GdkEventButton* e);
 	virtual void on_property_change(IPropertiesElement* m, const std::string& name, const std::string& val);
 	virtual void on_selection_event(ISelectable* s);
+	virtual void on_module_change(Module* m);
 
 
 	// ! Internals !

@@ -31,6 +31,21 @@ Document::Document() {
 	_cur = this;
 }
 
+void Document::new_document() {
+	filename = "";
+	bChanged = false;
+}
+
+void Document::save(const std::string& filename) {
+	this->filename = filename;
+	bChanged = false;
+}
+
+void Document::open(const std::string& filename) {
+	this->filename = filename;
+	bChanged = false;
+}
+
 
 ///////////////
 // ACCESSORS //
@@ -54,6 +69,7 @@ Module* Document::add_module(Module* m) {
 	modules.push_back(m);
 	m->add_properties_listener(this);
 	m->add_selection_listener(this);
+	m->add_change_listener(this);
 	return m;
 }
 
@@ -199,6 +215,10 @@ void Document::on_selection_event(ISelectable* s) {
 	}
 }
 
+void Document::on_module_change(Module* m) {
+	fire_change_event();
+}
+
 
 ///////////////
 // INTERNALS //
@@ -212,6 +232,7 @@ void Document::update_links_layers() {
 }
 
 void Document::fire_change_event() {
+	bChanged = true;
 	for(uint i=0; i<change_listeners.size(); i++)
 		change_listeners[i]->on_document_change();
 	ZoomableDrawingArea::cur()->repaint();

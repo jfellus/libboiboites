@@ -21,7 +21,8 @@ namespace libboiboites {
 #define STATUS(x) workbench_set_status(TOSTRING(x))
 void workbench_set_status(const std::string& text);
 
-
+#define POPUP(x) _POPUP(TOSTRING(x))
+void _POPUP(const std::string& msg);
 
 class Workbench : public Document::IPropertiesListener, Document::IDocumentChangeListener,
 							ZoomableDrawingArea::ISelectionListener, ZoomableDrawingArea::IChangeListener, ZoomableDrawingArea::IDblClickListener {
@@ -36,7 +37,7 @@ public:
 
 	bool bPreventUpdating = false;
 
-	std::string cur_filename = "";
+	std::string application_name = "";
 
 public:
 	static Workbench* cur();
@@ -65,6 +66,7 @@ public:
 	}
 
 	void set_title(const std::string& title);
+	virtual void update_title();
 
 	void allow_update() {bPreventUpdating = false;}
 	void prevent_update() {bPreventUpdating = true;}
@@ -73,6 +75,7 @@ public:
 
 	bool question(const std::string& msg);
 
+	void popup(const std::string& msg);
 
 	// Selection
 
