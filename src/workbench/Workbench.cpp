@@ -21,7 +21,6 @@
 #include "../commands/CommandSpaceSelection.h"
 #include "../commands/CommandAlignSelection.h"
 #include "Job.h"
-#include <X11/Xlib.h>
 #include "../widget/Popup.h"
 
 namespace libboiboites {
@@ -318,21 +317,34 @@ void Workbench::popup(const std::string& msg) {
 // IO //
 ////////
 
+bool Workbench::ask_save_modifications() {
+	if(document->bChanged) {
+		if(!question("Your document has unsaved modifications. Do you wish to save it first ?")) {
+			if(!question("Are you sure you want to loose all these modifications ?")) return false;
+		} else save();
+	}
+	return true;
+}
+
 void Workbench::new_document() {
+	if(!ask_save_modifications()) return;
 	JOB_SUBMIT("New document", Workbench::cur()->do_new_document());
 }
 
 void Workbench::close() {
+	if(!ask_save_modifications()) return;
 	JOB_SUBMIT("Close", Workbench::cur()->do_close());
 }
 
 
 void Workbench::open() {
+	if(!ask_save_modifications()) return;
 	std::string filename = open_file_dialog(win->widget);
 	if(!filename.empty()) open(filename);
 }
 
 void Workbench::reopen() {
+	if(!ask_save_modifications()) return;
 	if(document && !document->filename.empty()) open(document->filename);
 }
 
@@ -349,6 +361,7 @@ void Workbench::save_as() {
 }
 
 void Workbench::open(const std::string& filename) {
+	if(!ask_save_modifications()) return;
 	document->open(filename);
 	JOB_SUBMIT(TOSTRING("Open " << filename),Workbench::cur()->do_open(Document::cur()->filename));
 }

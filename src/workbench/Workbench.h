@@ -74,7 +74,7 @@ public:
 	void toggle_display_all_modules_details();
 
 	bool question(const std::string& msg);
-
+	bool ask_save_modifications();
 	void popup(const std::string& msg);
 
 	// Selection
