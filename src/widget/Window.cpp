@@ -20,6 +20,13 @@ typedef struct _callbacks {
 	}
 } _callbacks;
 
+static gboolean _on_quit(void* p) {
+	Window* w = (Window*)p;
+	w->on_quit();
+	return FALSE;
+}
+
+
 
 std::string _do_yes_no_box_str;
 bool _do_yes_no_box_ret;
@@ -82,7 +89,7 @@ Window::Window() : Widget(NULL){
 
 	maximize();
 	gtk_window_set_default_size(GTK_WINDOW(widget), 800,600);
-	g_signal_connect(widget, "destroy", G_CALLBACK(gtk_main_quit), 0);
+	g_signal_connect(widget, "destroy", G_CALLBACK(_on_quit), this);
 
 
 	gtk_window_set_focus(GTK_WINDOW(widget), canvas->widget);
@@ -96,6 +103,15 @@ Window::Window() : Widget(NULL){
 
 Window::~Window() {
 	g_object_unref (G_OBJECT (builder));
+}
+
+void Window::on_quit() {
+	DBG("OK");
+	bool bQuit = true;
+	for(uint i=0; i<quitListeners.size(); i++) {
+		if(!quitListeners[i]->on_quit()) bQuit = false;
+	}
+	if(bQuit) gtk_main_quit();
 }
 
 int Window::get_menu_pos(const char* menustr) {

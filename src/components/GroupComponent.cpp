@@ -65,5 +65,21 @@ void GroupOpenComponent::render(Graphics& g) {
 }
 
 
+int _compute_handle_bounds(void* p) {
+	GroupOpenComponent* g = (GroupOpenComponent*)p;
+	g->do_compute_handle_bounds();
+	return FALSE;
+}
+void GroupOpenComponent::compute_handle_bounds() {
+	g_timeout_add(1, _compute_handle_bounds, this);
+}
+
+void GroupOpenComponent::do_compute_handle_bounds() {
+	GroupOpenComponentStyle* style = (GroupOpenComponentStyle*)this->style;
+	Graphics g;
+	g.set_font(style->font_size, style->font);
+	handle_bounds = g.text_extents(group->text);
+}
+
 
 }

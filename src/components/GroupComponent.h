@@ -120,6 +120,8 @@ public:
 	Group* group = NULL;
 public:
 	bool translating = false;
+	Rectangle handle_bounds;
+
 public:
 	GroupOpenComponent(Group* g) : Component(-1000) {
 		ready = false;
@@ -169,21 +171,17 @@ public:
 	}
 
 	Rectangle get_handle_bounds(Rectangle bounds) {
-		GroupOpenComponentStyle* style = (GroupOpenComponentStyle*)this->style;
-		Graphics g;
-		g.set_font(style->font_size, style->font);
-		Rectangle e = g.text_extents(group->text);
-		float f = e.w/bounds.w;
-		if(f>0.7) {
-			g.set_font(style->font_size / f *0.7, style->font);
-			e = g.text_extents(group->text);
-		}
-		bounds.x += bounds.w - e.w - 25;
-		bounds.y -= e.h + 25;
-		bounds.w  = e.w + 40;
-		bounds.h = e.h + 25;
+		bounds.x += bounds.w - handle_bounds.w - 25;
+		bounds.y -= handle_bounds.h + 25;
+		bounds.w  = handle_bounds.w + 40;
+		bounds.h = handle_bounds.h + 25;
 		return bounds;
 	}
+
+
+	void compute_handle_bounds();
+
+	void do_compute_handle_bounds();
 
 };
 

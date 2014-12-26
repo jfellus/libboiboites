@@ -71,6 +71,7 @@ HTTPServer::HTTPServer(int port) {
 				&answer_to_connection, this, MHD_OPTION_END);
 		if(daemon==NULL) this->port++;
 	}
+	DBG("Daemon = " << daemon << " port=" << this->port);
 
 	if (NULL == daemon) throw "Can't init HTTP Server";
 }

@@ -98,14 +98,6 @@ static void on_align_selection() {Workbench::cur()->align_selection();}
 
 static void on_zoom_all()  {Workbench::cur()->canvas->zoom_all();}
 
-static bool _bUpdating = false;
-static void _on_update() {
-	_bUpdating = true;
-	Workbench::cur()->update(true);
-	_bUpdating = false;
-}
-
-
 
 /////////////////////
 // WORKBENCH CLASS //
@@ -237,10 +229,7 @@ Workbench::Workbench() {
 	canvas->add_selection_listener(this);
 	canvas->add_change_listener(this);
 	canvas->add_dbl_click_listener(this);
-
-
-	g_signal_new("update_workbench", G_TYPE_OBJECT, G_SIGNAL_RUN_FIRST, 0, NULL, NULL, NULL, G_TYPE_NONE, 0);
-	g_signal_connect(G_OBJECT(win->widget), "update_workbench", G_CALLBACK(_on_update), this);
+	win->add_quit_listener(this);
 }
 
 Workbench::~Workbench() {	delete win; }
@@ -255,24 +244,48 @@ void Workbench::run() {	win->show_all();
 }
 
 
-void Workbench::update(bool force) {
-	if(bPreventUpdating && !force) return;
+static bool update_requested = false;
+static int _update(void*) {
+	Workbench::cur()->do_update();
+	return FALSE;
+}
+
+void Workbench::do_update() {
 	STATUS(get_selected_modules()->size() << " modules selected\t\t" << get_selected_links()->size() << " links selected");
 	if(canvas) {		canvas->grab_focus();		canvas->repaint(); }
 	if(properties) properties->update(get_selected_modules(), get_selected_links());
 
 	if(infoform) infoform->update();
 	if(properties) properties->update();
+	update_requested = false;
+}
+
+void Workbench::update() {
+	if(update_requested) return;
+	update_requested = true;
+	g_timeout_add(1, _update, NULL);
 }
 
 void Workbench::set_title(const std::string& title) {
 	win->set_title(title);
 }
 
-void Workbench::update_title() {
+
+int _update_title(void* p) {
+	Workbench* w = (Workbench*)p;
+	w->do_update_title();
+	return FALSE;
+}
+
+void Workbench::do_update_title() {
 	if(document && !document->filename.empty())
 		set_title(TOSTRING(application_name << " - " << document->filename << (document->bChanged ? "*" : "")));
 	else set_title(application_name);
+}
+
+
+void Workbench::update_title() {
+	g_timeout_add(1,_update_title,this);
 }
 
 
@@ -490,6 +503,17 @@ void Workbench::on_property_change(IPropertiesElement* m, const std::string& nam
 void Workbench::on_dbl_click(Component* c) {
 	if(c) edit();
 	else edit(false);
+}
+
+bool Workbench::on_quit() {
+	if(document && document->bChanged) {
+		if(question("There are unsaved changes. Save them ?")) {
+			save();
+		} else if(!question("Are you sure to quit without saving ?")) {
+			return false;
+		}
+	}
+	return true;
 }
 
 

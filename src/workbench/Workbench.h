@@ -24,7 +24,7 @@ void workbench_set_status(const std::string& text);
 #define POPUP(x) _POPUP(TOSTRING(x))
 void _POPUP(const std::string& msg);
 
-class Workbench : public Document::IPropertiesListener, Document::IDocumentChangeListener,
+class Workbench : public Document::IPropertiesListener, Document::IDocumentChangeListener, Window::IQuitListener,
 							ZoomableDrawingArea::ISelectionListener, ZoomableDrawingArea::IChangeListener, ZoomableDrawingArea::IDblClickListener {
 
 public:
@@ -66,7 +66,8 @@ public:
 	}
 
 	void set_title(const std::string& title);
-	virtual void update_title();
+	void update_title();
+	virtual void do_update_title();
 
 	void allow_update() {bPreventUpdating = false;}
 	void prevent_update() {bPreventUpdating = true;}
@@ -129,7 +130,8 @@ public:
 
 	// Runtime
 
-	virtual void update(bool force = false);
+	void update();
+	virtual void do_update();
 	void run();
 
 
@@ -140,6 +142,7 @@ public:
 	virtual void on_document_change();
 	virtual void on_canvas_change();
 	virtual void on_dbl_click(Component* c);
+	virtual bool on_quit();
 
 	// Debug
 

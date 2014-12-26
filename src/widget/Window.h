@@ -19,6 +19,14 @@ namespace libboiboites {
 
 class Window : public Widget {
 public:
+	class IQuitListener {
+	public:
+		IQuitListener() {}
+		virtual ~IQuitListener() {}
+		virtual bool on_quit() = 0;
+	};
+
+public:
 
 	ZoomableDrawingArea* canvas = 0;
 	GtkWidget* status = 0;
@@ -26,6 +34,8 @@ public:
 	GtkWidget* menubar = 0;
 	GtkWidget* toolbar = 0;
 	GtkWidget* split = 0;
+
+	std::vector<IQuitListener*> quitListeners;
 
 private:
 	bool bFirstDraw = true;
@@ -40,6 +50,8 @@ public:
 	void add(GtkWidget* w) { gtk_container_add(GTK_CONTAINER(widget), w); }
 	void close();
 	void show_all() {gtk_widget_show_all(widget);}
+
+	void add_quit_listener(IQuitListener* l) {quitListeners.push_back(l);}
 
 	void add_menu(const char* menustr, void (*callback)(), int pos = -1, int accelerator_key = 0);
 	void add_menu(const char* menustr, void (*callback)(GtkMenuItem*,void*), void* param, int pos = -1, int accelerator_key = 0);
@@ -78,6 +90,8 @@ protected:
 	virtual gboolean on_draw(cairo_t* cr) {return FALSE;}
 	virtual void on_size_allocate(GdkRectangle* alloc) ;
 	virtual gboolean on_key(GdkEventKey* e) ;
+public:
+	virtual void on_quit();
 };
 
 }
