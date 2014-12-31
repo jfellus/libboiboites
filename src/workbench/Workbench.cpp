@@ -92,7 +92,7 @@ static void on_reconnect_link()  {Workbench::cur()->reconnect_link();}
 
 static void on_display_all_modules_details()  {Workbench::cur()->toggle_display_all_modules_details();}
 
-static void on_space_selection(double x, double y, double dx, double dy) {Workbench::cur()->space_selection(-dy);}
+static void on_space_selection(double x, double y, double dx, double dy, void* p) {Workbench::cur()->space_selection(-dy);}
 static void on_align_selection() {Workbench::cur()->align_selection();}
 
 
@@ -159,7 +159,7 @@ Workbench::Workbench() {
 	canvas->add_key_listener(new IKeyListener(GDK_KEY_x, GDK_CONTROL_MASK, on_cut));
 
 
-	canvas->add_scroll_listener(new IScrollListener(GDK_CONTROL_MASK|GDK_SHIFT_MASK, libboiboites::on_space_selection));
+	canvas->add_scroll_listener(new IScrollListener(GDK_CONTROL_MASK|GDK_SHIFT_MASK, libboiboites::on_space_selection, NULL));
 
 	// Menus
 

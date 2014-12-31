@@ -131,6 +131,7 @@ public:
 		style = new GroupOpenComponentStyle();
 		style->update(css_class);
 		ready = true;
+		compute_handle_bounds();
 	}
 
 	virtual ~GroupOpenComponent() {}

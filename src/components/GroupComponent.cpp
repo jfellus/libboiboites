@@ -54,11 +54,6 @@ void GroupOpenComponent::render(Graphics& g) {
 	if(!group->text.empty()) {
 		if(style->bTextColor) {	g.set_color(style->text_color); }
 		g.set_font(style->font_size, style->font);
-		Rectangle rr = g.text_extents(group->text);
-		float f = rr.w/r.w;
-		if(f>0.7) {
-			g.set_font(style->font_size / f *0.7, style->font);
-		}
 		g.text(group->text, rhandle);
 	}
 
@@ -79,6 +74,8 @@ void GroupOpenComponent::do_compute_handle_bounds() {
 	Graphics g;
 	g.set_font(style->font_size, style->font);
 	handle_bounds = g.text_extents(group->text);
+	handle_bounds.y += 0.35 * handle_bounds.h;
+	handle_bounds.h *= 0.65;
 }
 
 

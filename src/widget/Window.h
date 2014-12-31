@@ -9,6 +9,7 @@
 #define WINDOW_H_
 
 #include <gtk/gtk.h>
+#include <gdk/gdk.h>
 #include <glib.h>
 #include <ZoomableDrawingArea.h>
 #include <util/utils.h>
@@ -45,6 +46,11 @@ public:
 	Window();
 	virtual ~Window();
 
+	void set_icon(const char* png) {
+		GdkPixbuf* p = gdk_pixbuf_new_from_file(png, NULL);
+		if(!p) DBG("Can't load icon " << png);
+		else gtk_window_set_icon(GTK_WINDOW(widget), p);
+	}
 	void maximize() {	gtk_window_maximize(GTK_WINDOW(widget)); }
 	void set_title(const std::string& s) { gtk_window_set_title(GTK_WINDOW(widget), s.c_str());}
 	void add(GtkWidget* w) { gtk_container_add(GTK_CONTAINER(widget), w); }
