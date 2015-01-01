@@ -106,7 +106,10 @@ void Module::attach() {
 	if(bAttached) return;
 	bAttached = true;
 	bDetachedSlave = false;
-	if(parent) parent->attach();
+	if(parent) {
+		parent->add(this);
+		parent->attach();
+	}
 	component->show();
 	Document* doc = Document::cur();
 	doc->modules.push_back(this);
@@ -125,6 +128,8 @@ void Module::detach(bool bSlave) {
 	if(parent!=NULL) {
 		Group* g = parent;
 		if(g->children.size()==1 && g->children[0]==this && !g->bDeleted) g->detach(bSlave);
+		g->remove(this);
+		parent = g;
 	}
 	component->hide();
 	Document::cur()->remove_module(this, false);

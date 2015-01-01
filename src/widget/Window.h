@@ -69,6 +69,7 @@ public:
 
 	void add_toolbar(const std::string& name, const std::string& btn_icon, void (*callback)(GtkToolItem*, void*), void* param);
 	void add_toolbar(const std::string& name, const std::string&  btn_icon, void (*callback)());
+	void add_toolbar_toggle(const std::string& name, const std::string&  btn_icon, void (*callback)(GtkToggleButton*,void*));
 	void add_toolbar(const std::string& name, const std::string& btn_icon, void (*callback)(GtkToolItem*, void*), void* param, int before);
 	void add_toolbar(const std::string& name, const std::string&  btn_icon, void (*callback)(), int before);
 	void add_toolbar(const std::string& name);

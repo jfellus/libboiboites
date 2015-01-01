@@ -94,7 +94,7 @@ public:
 
 		for(uint i=0; i<pastable->clipboard_modules.size(); i++) {
 			Module* m = pastable->clipboard_modules[i];
-			m->component->center(Vector2D(x,y) + m->component->center() - pastable->clipboard_center);
+			m->component->center(Vector2D(x,y) + m->component->center() - pastable->clipboard_center, true);
 			if(m->parent) m->parent->remove(m);
 			if(group) group->add(m);
 		}

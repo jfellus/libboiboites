@@ -239,6 +239,18 @@ void Window::add_toolbar(const std::string& name, const std::string& btn_icon, v
 	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), b, -1);
 }
 
+void Window::add_toolbar_toggle(const std::string& name, const std::string& btn_icon, void (*callback)(GtkToggleButton* b, void* p)) {
+	GtkWidget* icon = gtk_image_new_from_file(btn_icon.c_str());
+	GtkToolItem* b = gtk_toggle_tool_button_new();
+	gtk_tool_button_set_icon_widget(GTK_TOOL_BUTTON(b), GTK_WIDGET(icon));
+	gtk_tool_button_set_label(GTK_TOOL_BUTTON(b), name.c_str());
+	gtk_container_set_border_width(GTK_CONTAINER(b), 0);
+	gtk_widget_set_size_request(GTK_WIDGET(b), 20,20);
+	gtk_widget_set_tooltip_text(GTK_WIDGET(b), name.c_str());
+	g_signal_connect(G_OBJECT(b), "clicked", G_CALLBACK(callback), NULL);
+	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), b, -1);
+}
+
 void Window::add_toolbar(const std::string& name) {
 	GtkToolItem* b = gtk_separator_tool_item_new();
 	gtk_container_set_border_width(GTK_CONTAINER(b), 0);
@@ -269,8 +281,13 @@ int Window::get_toolbar_pos(const std::string& name) {
 void Window::enable_toolbar(const std::string& name, bool bEnable) {
 	GList* l = gtk_container_get_children(GTK_CONTAINER(toolbar));
 	for(GList * elem = l; elem; elem = elem->next) {
-		if(name==gtk_tool_button_get_label(GTK_TOOL_BUTTON(l->data)))
-			{gtk_widget_set_sensitive(GTK_WIDGET(l->data), bEnable); return;}
+		if(GTK_IS_TOOL_BUTTON(elem->data) && name==gtk_tool_button_get_label(GTK_TOOL_BUTTON(elem->data))) {
+			if(bEnable && GTK_IS_TOGGLE_TOOL_BUTTON(elem->data)) {
+				gtk_toggle_tool_button_set_active(GTK_TOGGLE_TOOL_BUTTON(elem->data), false);
+			}
+			gtk_widget_set_sensitive(GTK_WIDGET(elem->data), bEnable);
+			return;
+		}
 	}
 }
 
