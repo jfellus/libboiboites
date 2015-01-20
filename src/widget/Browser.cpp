@@ -120,7 +120,15 @@ Browser::~Browser() {
 
 
 void Browser::open(const std::string& file) {
-	webkit_web_view_load_uri(webkitview, TOSTRING("file://" << main_dir() << "/" << file << "#server_port=" << server->port).c_str());
+	std::string f = file;
+	if(!file_exists(f)) {
+		f = TOSTRING(main_dir() << "/" << file);
+		if(!file_exists(f)) {
+			f = resolve_path(file);
+		}
+	}
+
+	webkit_web_view_load_uri(webkitview, TOSTRING("file://" << f << "#server_port=" << server->port).c_str());
 	if(ZoomableDrawingArea::cur()) ZoomableDrawingArea::cur()->grab_focus();
 }
 

@@ -16,6 +16,9 @@
 
 namespace libboiboites {
 
+void add_resources_path(const std::string& f);
+std::string resolve_path(const std::string& f);
+
 // Utils
 
 #define STATUS(x) workbench_set_status(TOSTRING(x))
@@ -38,6 +41,7 @@ public:
 	bool bPreventUpdating = false;
 
 	std::string application_name = "";
+	std::string app_dir = "./";
 
 public:
 	static Workbench* cur();

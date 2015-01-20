@@ -7,6 +7,8 @@
 
 #include "Window.h"
 #include <semaphore.h>
+#include "../workbench/Workbench.h"
+
 
 namespace libboiboites {
 
@@ -208,7 +210,7 @@ void Window::remove_menu(const char* menustr, int offset) {
 }
 
 void Window::add_toolbar(const std::string& name, const std::string& btn_icon, void (*callback)(GtkToolItem*, void*), void* param) {
-	GtkWidget* icon = gtk_image_new_from_file(btn_icon.c_str());
+	GtkWidget* icon = gtk_image_new_from_file(resolve_path(btn_icon).c_str());
 	GtkToolItem* b = gtk_tool_button_new(icon, name.c_str());
 	gtk_container_set_border_width(GTK_CONTAINER(b), 0);
 	gtk_widget_set_size_request(GTK_WIDGET(b), 20,20);
@@ -219,7 +221,7 @@ void Window::add_toolbar(const std::string& name, const std::string& btn_icon, v
 
 
 void Window::add_toolbar(const std::string& name, const std::string& btn_icon, void (*callback)(GtkToolItem*, void*), void* param, int before) {
-	GtkWidget* icon = gtk_image_new_from_file(btn_icon.c_str());
+	GtkWidget* icon = gtk_image_new_from_file(resolve_path(btn_icon).c_str());
 	GtkToolItem* b = gtk_tool_button_new(icon, name.c_str());
 	gtk_container_set_border_width(GTK_CONTAINER(b), 0);
 	gtk_widget_set_size_request(GTK_WIDGET(b), 20,20);
@@ -229,7 +231,7 @@ void Window::add_toolbar(const std::string& name, const std::string& btn_icon, v
 }
 
 void Window::add_toolbar(const std::string& name, const std::string& btn_icon, void (*callback)()) {
-	GtkWidget* icon = gtk_image_new_from_file(btn_icon.c_str());
+	GtkWidget* icon = gtk_image_new_from_file(resolve_path(btn_icon).c_str());
 	GtkToolItem* b = gtk_tool_button_new(icon, name.c_str());
 	gtk_container_set_border_width(GTK_CONTAINER(b), 0);
 	gtk_widget_set_size_request(GTK_WIDGET(b), 20,20);
@@ -239,7 +241,7 @@ void Window::add_toolbar(const std::string& name, const std::string& btn_icon, v
 }
 
 void Window::add_toolbar_toggle(const std::string& name, const std::string& btn_icon, void (*callback)(GtkToggleButton* b, void* p)) {
-	GtkWidget* icon = gtk_image_new_from_file(btn_icon.c_str());
+	GtkWidget* icon = gtk_image_new_from_file(resolve_path(btn_icon).c_str());
 	GtkToolItem* b = gtk_toggle_tool_button_new();
 	gtk_tool_button_set_icon_widget(GTK_TOOL_BUTTON(b), GTK_WIDGET(icon));
 	gtk_tool_button_set_label(GTK_TOOL_BUTTON(b), name.c_str());
@@ -257,7 +259,7 @@ void Window::add_toolbar(const std::string& name) {
 }
 
 void Window::add_toolbar(const std::string& name, const std::string& btn_icon, void (*callback)(), int before) {
-	GtkWidget* icon = gtk_image_new_from_file(btn_icon.c_str());
+	GtkWidget* icon = gtk_image_new_from_file(resolve_path(btn_icon).c_str());
 	GtkToolItem* b = gtk_tool_button_new(icon, name.c_str());
 	gtk_container_set_border_width(GTK_CONTAINER(b), 0);
 	gtk_widget_set_size_request(GTK_WIDGET(b), 20,20);
@@ -404,6 +406,13 @@ void Window::show_tab(int i) {
 }
 
 void Window::on_size_allocate(GdkRectangle* alloc) {
+}
+
+void Window::set_icon(const char* png) {
+	std::string f = resolve_path(png);
+	GdkPixbuf* p = gdk_pixbuf_new_from_file(f.c_str(), NULL);
+	if(!p) DBG("Can't load icon " << png);
+	else gtk_window_set_icon(GTK_WINDOW(widget), p);
 }
 
 void Window::close() {gtk_widget_destroy(GTK_WIDGET(widget)); }

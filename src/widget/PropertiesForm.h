@@ -27,7 +27,7 @@ public:
 public:
 	PropertiesForm(Properties* properties = NULL) : Browser("properties") {
 		this->properties = properties;
-		open("src/js/properties_form.html");
+		open(".coeos++/src/js/properties_form.html");
 	}
 	virtual ~PropertiesForm() {	}
 

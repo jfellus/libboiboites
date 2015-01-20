@@ -28,6 +28,20 @@ namespace libboiboites {
 static Workbench* _cur = 0;
 Workbench* Workbench::cur() { return _cur;}
 
+std::list<std::string> resources_paths;
+void add_resources_path(const std::string& f) {
+	resources_paths.push_back(f);
+}
+
+std::string resolve_path(const std::string& f) {
+	if(file_exists(f)) return f;
+	for(auto i = resources_paths.begin(); i != resources_paths.end(); i++) {
+		std::string s = TOSTRING(*i << "/" << f);
+		if(file_exists(s)) return s;
+	}
+	return f;
+}
+
 
 ///////////
 // DEBUG //
@@ -205,20 +219,20 @@ Workbench::Workbench() {
 	win->add_menu("_View>Display all modules details", on_display_all_modules_details);
 
 
-	win->add_toolbar("new", TOSTRING(main_dir() << "/style/icons/" << "new.gif"), on_new);
-	win->add_toolbar("open", TOSTRING(main_dir() << "/style/icons/" << "open.gif"), on_open);
-	win->add_toolbar("save", TOSTRING(main_dir() << "/style/icons/" << "save.gif"), on_save);
-	win->add_toolbar("save as", TOSTRING(main_dir() << "/style/icons/" << "save_as.gif"), on_saveas);
+	win->add_toolbar("new", TOSTRING(app_dir << "style/icons/" << "new.gif"), on_new);
+	win->add_toolbar("open", TOSTRING(app_dir << "style/icons/" << "open.gif"), on_open);
+	win->add_toolbar("save", TOSTRING(app_dir << "style/icons/" << "save.gif"), on_save);
+	win->add_toolbar("save as", TOSTRING(app_dir << "style/icons/" << "save_as.gif"), on_saveas);
 	win->add_toolbar("__");
-	win->add_toolbar("undo", TOSTRING(main_dir() << "/style/icons/" << "undo.gif"), on_undo);
-	win->add_toolbar("redo", TOSTRING(main_dir() << "/style/icons/" << "redo.gif"), on_redo);
-	win->add_toolbar("cut", TOSTRING(main_dir() << "/style/icons/" << "cut.gif"), on_cut);
-	win->add_toolbar("copy", TOSTRING(main_dir() << "/style/icons/" << "copy.gif"), on_copy);
-	win->add_toolbar("paste", TOSTRING(main_dir() << "/style/icons/" << "paste.gif"), on_paste);
-	win->add_toolbar("delete", TOSTRING(main_dir() << "/style/icons/" << "delete.gif"), on_delete);
+	win->add_toolbar("undo", TOSTRING(app_dir << "style/icons/" << "undo.gif"), on_undo);
+	win->add_toolbar("redo", TOSTRING(app_dir << "style/icons/" << "redo.gif"), on_redo);
+	win->add_toolbar("cut", TOSTRING(app_dir << "style/icons/" << "cut.gif"), on_cut);
+	win->add_toolbar("copy", TOSTRING(app_dir << "style/icons/" << "copy.gif"), on_copy);
+	win->add_toolbar("paste", TOSTRING(app_dir << "style/icons/" << "paste.gif"), on_paste);
+	win->add_toolbar("delete", TOSTRING(app_dir << "style/icons/" << "delete.gif"), on_delete);
 	win->add_toolbar("__");
-	win->add_toolbar("new module", TOSTRING(main_dir() << "/style/icons/" << "new_module.gif"), on_create_module);
-	win->add_toolbar("new link", TOSTRING(main_dir() << "/style/icons/" << "new_link.gif"), on_create_link);
+	win->add_toolbar("new module", TOSTRING(app_dir << "style/icons/" << "new_module.gif"), on_create_module);
+	win->add_toolbar("new link", TOSTRING(app_dir << "style/icons/" << "new_link.gif"), on_create_link);
 
 
 
