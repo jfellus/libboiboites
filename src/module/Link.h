@@ -19,7 +19,7 @@ class Link : public ISelectable, ISelectionListener, public IPropertiesElement {
 public:
 	LinkComponent* component;
 	Module *src, *dst;
-	std::string text;
+	std::string text, text2;
 
 	bool bAttached = false;
 

@@ -23,7 +23,8 @@ LinkLinkComponent::LinkLinkComponent(Link* l, Component* src, Component* dst, st
 	ready = true;
 }
 
-
+bool LinkComponentStyle::bText2_force = false;
+bool LinkComponentStyle::bText_force = false;
 void LinkLinkComponent::render(Graphics& g) {
 	LinkComponentStyle* style = (LinkComponentStyle*)this->style;
 	if(!style) return;
@@ -83,13 +84,21 @@ void LinkLinkComponent::render(Graphics& g) {
 
 	g.scale(_scale);
 
-	if(!link->text.empty()) {
+	if(!link->text.empty() || !link->text2.empty()) {
 		if(t2==-1) t2 = b.intersect_location(src->get_bounds());
 		if(t2==-1) t2 = 0;
 		Vector2D p = b.get((t1+t2)/2);
-		Rectangle r(p.x, p.y+6, 0,0);
-		r.x /= _scale; r.y /= _scale;
-		g.text(link->text, r);
+		if(!link->text.empty() && (style->bText || LinkComponentStyle::bText_force)) {
+			Rectangle r(p.x, p.y+6, 0,0);
+			r.x /= _scale; r.y /= _scale;
+			g.text(link->text, r);
+		}
+		if(!link->text2.empty() && (style->bText2 || LinkComponentStyle::bText2_force)) {
+			Rectangle r(p.x, p.y-6, 0,0);
+			r.x /= _scale; r.y /= _scale;
+			g.set_font(style->font_size_text2, style->font_text2, style->font_style_text2);
+			g.text(link->text2, r);
+		}
 	}
 }
 

@@ -30,6 +30,9 @@ public:
 	uint font_size = 20;
 	std::string font = "Serif";
 	int font_style = 0;
+	std::string font_text2 = "Serif";
+	int font_style_text2 = 0;
+	uint font_size_text2 = 5;
 	int slashes = 0;
 	int dashed = 0;
 	bool bPretty = false;
@@ -39,6 +42,10 @@ public:
 	float arrow_size = 0.8;
 	float thickness_selected = 3;
 	float thickness = 0.5;
+	bool bText = true;
+	bool bText2 = true;
+	static bool bText2_force;
+	static bool bText_force;
 
 	class Glow {
 	public:
@@ -70,6 +77,10 @@ public:
 		arrow_size = 0.8;
 		thickness_selected = 3;
 		thickness = 0.5;
+		bText = bText2 = true;
+		font_size_text2 = 5;
+		font_text2 = "Serif";
+		font_style_text2 = 0;
 	}
 
 	virtual const char* name() {return "link";}
@@ -83,6 +94,12 @@ public:
 			else if(e->property=="font-weight" && e->value=="bold") font_style |= 0x010;
 			else if(e->property=="font-style" && e->value!="italic") font_style &= !(0x001);
 			else if(e->property=="font-weight" && e->value!="bold") font_style &= !(0x010);
+			else if(e->property=="font-text2") font_text2 = e->value;
+			else if(e->property=="font-size-text2") fromString(e->value, font_size_text2);
+			else if(e->property=="font-style-text2" && e->value=="italic") font_style_text2 |= 0x001;
+			else if(e->property=="font-weight-text2" && e->value=="bold") font_style_text2 |= 0x010;
+			else if(e->property=="font-style-text2" && e->value!="italic") font_style_text2 &= !(0x001);
+			else if(e->property=="font-weight-text2" && e->value!="bold") font_style_text2 &= !(0x010);
 			else if(e->property=="color") color = e->value;
 			else if(e->property=="slashes") fromString(e->value, slashes);
 			else if(e->property=="dashed") fromString(e->value, dashed);
@@ -94,6 +111,8 @@ public:
 			else if(e->property=="arrow-size-selected") fromString(e->value, arrow_size_selected);
 			else if(e->property=="thickness-selected") fromString(e->value, thickness_selected);
 			else if(e->property=="thickness") fromString(e->value, thickness);
+			else if(e->property=="text") bText = e->value!="none";
+			else if(e->property=="text2") bText2 = e->value!="none";
 		}
 	}
 };
