@@ -273,4 +273,9 @@ void Group::attach() {
 }
 
 
+bool Group::hasPoint(double x, double y) {
+	if(is_opened()) return component_open && component_open->get_bounds().contains(x,y);
+	else return component && component->hasPoint(x,y);
+}
+
 }

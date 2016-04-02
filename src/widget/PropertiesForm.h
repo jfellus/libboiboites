@@ -19,15 +19,15 @@ namespace libboiboites {
 
 class PropertiesForm : public Browser {
 public:
+	std::string path;
 	Properties* properties = 0;
 	Properties* multiproperties = 0;
 	std::vector<Module*>* selected_modules = 0;
 	std::vector<Link*>* selected_links = 0;
-
 public:
-	PropertiesForm(Properties* properties = NULL) : Browser("properties") {
+	PropertiesForm(const std::string& path, Properties* properties = NULL) : Browser("properties"), path(path) {
 		this->properties = properties;
-		open(".coeos++/src/js/properties_form.html");
+		open(path);
 	}
 	virtual ~PropertiesForm() {	}
 

@@ -85,6 +85,9 @@ public:
 	virtual void create_component(const char* component_spec);
 
 	virtual void on_change() {}
+
+
+	bool hasPoint(double x, double y);
 };
 
 

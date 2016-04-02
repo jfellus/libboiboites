@@ -147,7 +147,7 @@ Workbench::Workbench() {
 	win = new Window();
 	ERROR_STREAM = new MessageErrorStream();
 
-	win->add_tab(properties = new PropertiesForm(), "Properties");
+//	win->add_tab(properties = new PropertiesForm(), "Properties");
 //	win->add_tab(infoform = new InfoForm(), "Infos");
 
 
@@ -523,9 +523,7 @@ bool Workbench::on_quit() {
 	if(document && document->bChanged) {
 		if(question("There are unsaved changes. Save them ?")) {
 			save();
-		} else if(!question("Are you sure to quit without saving ?")) {
-			return false;
-		}
+		} else return true;
 	}
 	return true;
 }

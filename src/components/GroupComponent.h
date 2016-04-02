@@ -148,12 +148,6 @@ public:
 
 	virtual bool is_in(const Rectangle& r) {return false;}
 
-	virtual bool hasPoint(double x, double y, bool bInside) {
-		if(!bInside) return hasPoint(x,y);
-		return get_bounds().contains(x,y);
-		return false;
-	}
-
 	virtual void translate(double dx, double dy, bool bFireEvent = false) {
 		if(!translating) {
 			translating = true;

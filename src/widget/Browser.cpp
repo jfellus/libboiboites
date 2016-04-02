@@ -120,7 +120,7 @@ Browser::~Browser() {
 
 
 void Browser::open(const std::string& file) {
-	std::string f = file;
+	std::string f = file_absolute_path(file);
 	if(!file_exists(f)) {
 		f = TOSTRING(main_dir() << "/" << file);
 		if(!file_exists(f)) {

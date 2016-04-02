@@ -56,8 +56,7 @@ Group* Document::get_group_at(double x, double y) {
 	for(uint i=0; i<modules.size(); i++) {
 		Group* g = dynamic_cast<Group*>(modules[i]);
 		if(!g) continue;
-		if((g->is_opened() && g->component_open->hasPoint(x,y, true))
-				|| (!g->is_opened() && g->component->hasPoint(x,y))) {
+		if(g->hasPoint(x,y)) {
 			if(winner==0 || winner->is_ancestor(g)) winner = g;
 		}
 	}
